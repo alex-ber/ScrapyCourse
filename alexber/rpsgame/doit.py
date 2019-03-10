@@ -11,7 +11,7 @@ def run():
     #     logger.info("Houston, we have a %s", "interesting problem", exc_info=e)
 
     #from alexber.rpsgame.utils.stuff import LookUpEnum
-    from .utils.stuff import LookUpEnum
+    from .utils import LookUpEnum
 
     class Color(LookUpEnum):
         RED = 'red',

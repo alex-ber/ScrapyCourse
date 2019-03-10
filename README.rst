@@ -1,17 +1,20 @@
+RocketPaperScissorsGame
+=======================
+
+RocketPaperScissorsGame is  a Python library.
+TODO
+
+Getting Help
+============
+TODO
+
 QuickStart
 ==========
-pip install . # only installs "required"
+TODO
 
-pip install .[test] # installs dependencies for tests
+Requirements
+============
 
-pip install .[windows] # installs dependencies for Windows
+RocketPaperScissorsGame requires the following modules.
 
-====
-
-From the directory with setup.py
-
-python setup.py test #run all tests
-
-pytest
-
-
+* Python 3.7+

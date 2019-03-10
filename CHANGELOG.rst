@@ -2,4 +2,12 @@
 
 Changelog
 =========
-TODO
+
+
+development version
+-------------------
+
+0.0.1
+-----
+
+* Initial skeleton
