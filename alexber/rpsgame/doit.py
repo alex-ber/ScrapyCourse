@@ -1,4 +1,4 @@
-import logging.config
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -19,3 +19,4 @@ def run():
         GREEN = 'green'
 
     logger.info(Color.RED)
+    logger.warning('TADAM')
