@@ -1,6 +1,6 @@
 import logging.config
 
-
+#see https://terryoy.github.io/2016/05/short-ref-python-logging.html
 _config = {
         "log_config": {
             "version": 1,

@@ -1,3 +1,3 @@
-from .stuff import LookUpEnum
+from alexber.utils import LookUpEnum
 
 

@@ -2,7 +2,6 @@
 from enum import Enum
 
 class StrAsReprEnum(Enum):
-
     def __str__(self):
         return self.__repr__()
 
@@ -17,3 +16,4 @@ class MissingNoneEnum(Enum):
 
 class LookUpEnum(StrAsReprEnum, MissingNoneEnum):
     pass
+

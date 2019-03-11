@@ -2,13 +2,16 @@ import setuptools
 from setuptools import setup
 import os
 
-print(__file__)
-print(os.path.abspath(__file__))
+print(str(__file__))
+print(os.path.realpath(__file__))
 print(setuptools.find_packages(exclude=('tests*',)))
+import sys
+sys.exit(0)
+
 
 #print(os.path.realpath(__file__))
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
+base_dir = os.path.dirname(os.path.realpath(__file__))
 
 def get_content(filename):
     with open(os.path.join(base_dir, filename)) as f:
@@ -16,12 +19,12 @@ def get_content(filename):
     return content
 
 install_requires = get_content('requirements.txt')
-tests_require = []#get_content('requirements-test.txt')
+tests_require = get_content('requirements-test.txt')
 
 
 
 setup(
-    name='rocket-paper-scissors-gmae',
+    name='rocket-paper-scissors-game',
     version='0.0.1',
     url='https://github.com/alex-ber/RocketPaperScissorsGame',
     author='Alexander Berkovich',
