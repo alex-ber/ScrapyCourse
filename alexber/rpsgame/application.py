@@ -19,12 +19,12 @@ _config = {
                     "level": "DEBUG",
                     "formatter": "brief",
                 },
-                "file": {
-                    "class": "logging.handlers.RotatingFileHandler",
-                    "filename": "dev.log",
-                    "level": "DEBUG",
-                    "formatter": "detail",
-                },
+                # "file": {
+                #     "class": "logging.handlers.RotatingFileHandler",
+                #     "filename": "dev.log",
+                #     "level": "DEBUG",
+                #     "formatter": "detail",
+                # },
             },
             "root": {
                 # "handlers": ["console", "file"],
@@ -44,8 +44,8 @@ _config = {
 
 
 def main():
-    from alexber.rpsgame import doit
-    doit.run()
+    from alexber.rpsgame import engine
+
 
 
 

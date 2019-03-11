@@ -1,9 +1,16 @@
 
 from enum import Enum
 
+
 class StrAsReprEnum(Enum):
     def __str__(self):
         return self.__repr__()
+
+
+class AutoNameEnum(Enum):
+    def _generate_next_value_(name, start, count, last_values):
+        return name
+
 
 class MissingNoneEnum(Enum):
 

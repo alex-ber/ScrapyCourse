@@ -7,5 +7,4 @@ if _loggerDict is None or not _loggerDict: #is None or {}
                      'This engine is useless without proper logger configuration.\n'+\
                      'See https://docs.python.org/3/howto/logging.html#configuring-logging '+\
                      'for details')
-
 del _loggerDict
