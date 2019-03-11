@@ -2,15 +2,6 @@ import setuptools
 from setuptools import setup
 import os
 
-print(str(__file__))
-print(os.path.realpath(__file__))
-print(setuptools.find_packages(exclude=('tests*',)))
-import sys
-sys.exit(0)
-
-
-#print(os.path.realpath(__file__))
-
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
 def get_content(filename):
