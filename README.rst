@@ -2,6 +2,7 @@ RocketPaperScissorsGame
 =======================
 
 RocketPaperScissorsGame is  a Python library.
+
 TODO
 
 Getting Help
@@ -16,7 +17,9 @@ pip install .[ws]   # installs web-service dependencies
 
 pip install .[test] # installs dependencies for tests
 
-#from the directory with setup.py
+====
+
+From the directory with setup.py
 
 python setup test #run all tests
 
