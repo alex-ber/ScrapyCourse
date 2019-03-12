@@ -1,7 +1,7 @@
 RocketPaperScissorsGame
 =======================
 
-RocketPaperScissorsGame is  a Python library.
+RocketPaperScissorsGame is a Python library.
 
 TODO
 
@@ -23,7 +23,7 @@ From the directory with setup.py
 
 python setup test #run all tests
 
-pytest -o log_cli=true --log-cli-level=DEBUG
+pytest
 
 
 Requirements
