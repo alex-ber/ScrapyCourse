@@ -1,5 +1,11 @@
 import logging.config
 
+
+def main():
+    from alexber.rpsgame import engine
+
+
+
 #see https://terryoy.github.io/2016/05/short-ref-python-logging.html
 _config = {
         "log_config": {
@@ -43,12 +49,7 @@ _config = {
     }
 
 
-def main():
-    from alexber.rpsgame import engine
-
-
-
-
 if __name__ == '__main__':
     logging.config.dictConfig(_config["log_config"])
+    del _config
     main()
