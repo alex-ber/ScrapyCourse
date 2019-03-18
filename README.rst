@@ -21,7 +21,7 @@ pip install .[test] # installs dependencies for tests
 
 From the directory with setup.py
 
-python setup test #run all tests
+python setup.py test #run all tests
 
 pytest
 

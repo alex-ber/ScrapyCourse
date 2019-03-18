@@ -1,3 +1,3 @@
-from alexber.utils import LookUpEnum, AutoNameEnum
+from alexber.utils import LookUpMixinEnum, AutoNameMixinEnum
 
 

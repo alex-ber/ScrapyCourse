@@ -2,17 +2,17 @@
 from enum import Enum
 
 
-class StrAsReprEnum(Enum):
+class StrAsReprMixinEnum(Enum):
     def __str__(self):
         return self.__repr__()
 
 
-class AutoNameEnum(Enum):
+class AutoNameMixinEnum(Enum):
     def _generate_next_value_(name, start, count, last_values):
         return name
 
 
-class MissingNoneEnum(Enum):
+class MissingNoneMixinEnum(Enum):
 
     @classmethod
     def _missing_(cls, value):
@@ -21,6 +21,6 @@ class MissingNoneEnum(Enum):
         return None
 
 
-class LookUpEnum(StrAsReprEnum, MissingNoneEnum):
+class LookUpMixinEnum(StrAsReprMixinEnum, MissingNoneMixinEnum):
     pass
 

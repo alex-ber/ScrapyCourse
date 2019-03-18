@@ -9,11 +9,36 @@ def my_dependency():
     return 42
 
 #@pytest.mark.ws
-def test_first(my_dependency    ):
+def test_first(my_dependency ):
     logger.info('Testing first')
+    from collections import OrderedDict
 
-def test_second():
+
+@pytest.fixture(params=[
+    # tuple with (input, expectedOutput)
+    ('regular text', 'regular text</p>'),
+    ('*em tags*', '<p><em>em tags</em></p>'),
+    ('**strong tags**', '<p><strong>strong tags</em></p>')
+])
+def test_data(request):
+    return request.param
+
+
+def test_markdown(test_data):
+    (the_input, the_expected_output) = test_data
+    def run_markdown(x):
+        return x
+
+    the_output = run_markdown(the_input)
+    #assert the_output == the_expected_output
+
+def test_second(mocker):
     print('Testing')
+    mocked_isfile = mocker.patch('os.path.isfile')
+    print(mocked_isfile)
+    print(type(mocked_isfile))
+    #import mock.mock._imported as imported
+
 
 
 def addComp(enumeration):
@@ -29,13 +54,13 @@ def addComp(enumeration):
 def test_run(request):
     logger.info(f'{request.function.__name__}()')
 
-    from alexber.utils import LookUpEnum, AutoNameEnum
+    from alexber.utils import LookUpMixinEnum, AutoNameMixinEnum
     from enum import auto
     import enum
 
     @enum.unique
     @addComp
-    class Color(LookUpEnum, AutoNameEnum):
+    class Color(LookUpMixinEnum, AutoNameMixinEnum):
         RED = 'R'
         BLUE = 'B'
         GREEN = "G"
@@ -51,3 +76,6 @@ def test_run(request):
 #     def test_some_test(self, request):
 #         logger.info(f'{request.function.__name__}()')
 
+
+if __name__ == "__main__":
+    pytest.main([__file__])
