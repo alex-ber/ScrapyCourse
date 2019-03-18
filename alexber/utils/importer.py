@@ -25,6 +25,7 @@ def importer(target):
         thing = _dot_lookup(thing, comp, import_path)
     return thing
 
-
-ctor = importer('pathlib.Path.__new__')
-print(ctor)
+cls_name = 'pathlib.Path'
+kls = importer(cls_name)
+path = kls()
+print(path.absolute())
