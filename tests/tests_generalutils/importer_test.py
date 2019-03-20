@@ -87,8 +87,8 @@ def test_new_instance_arg(request, mocker):
 
 @pytest.mark.parametrize(
      'plcls',
-    #(PlayerEmpty, PlayerInitFull,PlayerNewOnlyEmpty, PlayerEmpty, PlayerNewOnlyEmpty,PlayerNewAndInitEmpty,
-     (PlayerAbstractEmptyWithoutAbstractMethod, PlayerAbstractFullWithoutAbstractMethod),
+    (PlayerEmpty, PlayerInitFull,PlayerNewOnlyEmpty, PlayerEmpty, PlayerNewOnlyEmpty,PlayerNewAndInitEmpty,
+     PlayerAbstractEmptyWithoutAbstractMethod, PlayerAbstractFullWithoutAbstractMethod),
 )
 def test_new_instance(request, mocker, plcls):
     logger.info(f'{request._pyfuncitem.name}()')
