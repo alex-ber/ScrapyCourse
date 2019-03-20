@@ -1,4 +1,9 @@
 import importlib
+import logging
+import inspect
+
+logger = logging.getLogger(__name__)
+
 #
 # def _new_instance(fullqname):
 #     module_name, class_name = fullqname.rsplit(".", 1)
@@ -14,6 +19,7 @@ def _dot_lookup(thing, comp, import_path):
         importlib.import_module(import_path)
         return getattr(thing, comp)
 
+
 #adopted from mock.mock._importer
 def importer(target):
     components = target.split('.')
@@ -25,7 +31,17 @@ def importer(target):
         thing = _dot_lookup(thing, comp, import_path)
     return thing
 
-cls_name = 'pathlib.Path'
-kls = importer(cls_name)
-path = kls()
-print(path.absolute())
+
+'''
+importer() method is called.
+If target is class than __new__ and __init__ hooks are called on it and result is returned.
+Note: __init_subclass__ hoook is not supported.
+'''
+def new_instance(target, *args, **kwargs):
+    thing = importer(target)
+    ret = thing
+    if inspect.isclass(thing):
+        ret = thing.__new__(thing, *args)
+        thing.__init__(ret, *args, **kwargs)
+        #todo: take care of arguments __init_subclass__
+    return ret

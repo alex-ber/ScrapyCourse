@@ -52,7 +52,7 @@ def addComp(enumeration):
 
 
 def test_run(request):
-    logger.info(f'{request.function.__name__}()')
+    logger.info(f'{request._pyfuncitem.name}()')
 
     from alexber.utils import LookUpMixinEnum, AutoNameMixinEnum
     from enum import auto
@@ -74,7 +74,7 @@ def test_run(request):
 
 # class TestSome:
 #     def test_some_test(self, request):
-#         logger.info(f'{request.function.__name__}()')
+#         logger.info(f'{request._pyfuncitem.name}()')
 
 
 if __name__ == "__main__":
