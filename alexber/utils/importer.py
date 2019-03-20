@@ -43,5 +43,5 @@ def new_instance(target, *args, **kwargs):
     if inspect.isclass(thing):
         ret = thing.__new__(thing, *args)
         thing.__init__(ret, *args, **kwargs)
-        #todo: take care of arguments __init_subclass__
+        #tbd: take care of arguments __init_subclass__
     return ret
