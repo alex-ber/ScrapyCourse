@@ -52,6 +52,24 @@ class PlayerPhilosopher:
         print(f"Called __init_subclass({cls}, {default_name})")
         cls.default_name = default_name
 
+from abc import ABCMeta, abstractmethod
+
+class PlayerAbstractWithAbstractMethod(object, metaclass=ABCMeta):
+    @abstractmethod
+    def foo(self):
+        raise NotImplementedError
+
+
+class PlayerAbstractEmptyWithoutAbstractMethod(object, metaclass=ABCMeta):
+    pass
+
+class PlayerAbstractFullWithoutAbstractMethod(object, metaclass=ABCMeta):
+    def __new__(cls, *args, **kwargs):
+        self = object.__new__(cls)
+        return self
+
+    def __init__(self, *args, **kwargs):
+        pass
 
 
 
@@ -69,8 +87,8 @@ def test_new_instance_arg(request, mocker):
 
 @pytest.mark.parametrize(
      'plcls',
-    (PlayerEmpty, PlayerInitFull,PlayerNewOnlyEmpty, PlayerEmpty, PlayerNewOnlyEmpty,
-     PlayerNewAndInitEmpty),
+    #(PlayerEmpty, PlayerInitFull,PlayerNewOnlyEmpty, PlayerEmpty, PlayerNewOnlyEmpty,PlayerNewAndInitEmpty,
+     (PlayerAbstractEmptyWithoutAbstractMethod, PlayerAbstractFullWithoutAbstractMethod),
 )
 def test_new_instance(request, mocker, plcls):
     logger.info(f'{request._pyfuncitem.name}()')
@@ -100,6 +118,15 @@ def test_new_instance_init_subclass(request, mocker):
     assert player.__init_subclass__.call_count == 1
 
 
+def test_new_instance_abstract_method(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+    #mock = mocker.spy(PlayerAbstractWithAbstractMethod, '__init__')
+
+    input = '.'.join([__name__, PlayerAbstractWithAbstractMethod.__name__])
+
+    with pytest.raises(TypeError, match='abstract method') as excinfo:
+        player = new_instance(input)
+    logger.debug((excinfo.value, excinfo.traceback))
 
 
 
