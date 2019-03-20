@@ -37,7 +37,8 @@ def new_instance(target, *args, **kwargs):
     ret = thing
     if inspect.isclass(thing):
         ret = thing.__new__(thing, *args)
-        thing.__init__(ret, *args, **kwargs)
+        if isinstance(ret, thing):
+            thing.__init__(ret, *args, **kwargs)
         #tbd: take care of arguments __init_subclass__
         #see https://github.com/alex-ber/RocketPaperScissorsGame/issues/1
     return ret

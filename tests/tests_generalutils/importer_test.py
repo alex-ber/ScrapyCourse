@@ -35,16 +35,25 @@ class PlayerInitArg(object):
 
 class PlayerNewAndInitEmpty(object):
     def __new__(cls, *args, **kwargs):
-        self = object.__new__(cls)
+        self = super().__new__(cls)
         return self
 
 class PlayerNewOnlyEmpty(object):
     def __new__(cls, *args, **kwargs):
-        self = object.__new__(cls)
+        self = super().__new__(cls)
         return self
 
     def __init__(self, *args, **kwargs):
         pass
+
+class PlayerNewOnlyEmptySneaky(object):
+    def __new__(cls, *args, **kwargs):
+        self = super().__new__(cls)
+        return 3    #3 is not instace of this class '__init__" shouldn't be called
+
+    def __init__(self, *args, **kwargs):
+        pass
+
 
 class PlayerPhilosopher:
     def __init_subclass__(cls, default_name, **kwargs):
@@ -65,7 +74,7 @@ class PlayerAbstractEmptyWithoutAbstractMethod(object, metaclass=ABCMeta):
 
 class PlayerAbstractFullWithoutAbstractMethod(object, metaclass=ABCMeta):
     def __new__(cls, *args, **kwargs):
-        self = object.__new__(cls)
+        self = super().__new__(cls)
         return self
 
     def __init__(self, *args, **kwargs):
@@ -89,6 +98,7 @@ def test_new_instance_arg(request, mocker):
      'plcls',
     (PlayerEmpty, PlayerInitFull,PlayerNewOnlyEmpty, PlayerEmpty, PlayerNewOnlyEmpty,PlayerNewAndInitEmpty,
      PlayerAbstractEmptyWithoutAbstractMethod, PlayerAbstractFullWithoutAbstractMethod),
+
 )
 def test_new_instance(request, mocker, plcls):
     logger.info(f'{request._pyfuncitem.name}()')
@@ -128,6 +138,15 @@ def test_new_instance_abstract_method(request, mocker):
         player = new_instance(input)
     logger.debug((excinfo.value, excinfo.traceback))
 
+
+
+def test_new_instance_sneaky(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+    mock = mocker.spy(PlayerNewOnlyEmptySneaky, '__init__')
+
+    input = '.'.join([__name__, PlayerNewOnlyEmptySneaky.__name__])
+    player=new_instance(input)
+    assert not hasattr(player.__init__, 'call_count') or player.__init__.call_count == 0
 
 
 if __name__ == "__main__":
