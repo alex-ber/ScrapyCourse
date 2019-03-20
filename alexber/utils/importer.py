@@ -4,12 +4,7 @@ import inspect
 
 logger = logging.getLogger(__name__)
 
-#
-# def _new_instance(fullqname):
-#     module_name, class_name = fullqname.rsplit(".", 1)
-#     MyClass = getattr(importlib.import_module(module_name), class_name)
-#     instance = MyClass()
-#     return instance
+
 
 #adopted from mock.mock._dot_lookup
 def _dot_lookup(thing, comp, import_path):
@@ -44,4 +39,5 @@ def new_instance(target, *args, **kwargs):
         ret = thing.__new__(thing, *args)
         thing.__init__(ret, *args, **kwargs)
         #tbd: take care of arguments __init_subclass__
+        #see https://github.com/alex-ber/RocketPaperScissorsGame/issues/1
     return ret

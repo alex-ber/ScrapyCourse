@@ -19,7 +19,7 @@ class TestImporter(object):
         logger.info(path.absolute())
 
         assert namespace.importer == importer
-        importer.assert_called_once_with(cls_name)
+
 
 class PlayerEmpty(object):
     pass
@@ -66,17 +66,11 @@ def test_new_instance_arg(request, mocker):
     assert player.__init__.call_count == 1
 
 
-@pytest.fixture
-def plcls(request):
-    return globals()[request.param]
-
 
 @pytest.mark.parametrize(
      'plcls',
-     #(['PlayerEmpty', False, False], ['PlayerInitFull', False, False]),
-    ('PlayerEmpty', 'PlayerInitFull','PlayerNewOnlyEmpty', 'PlayerEmpty', 'PlayerNewOnlyEmpty',
-     'PlayerNewAndInitEmpty'),
-     indirect=True
+    (PlayerEmpty, PlayerInitFull,PlayerNewOnlyEmpty, PlayerEmpty, PlayerNewOnlyEmpty,
+     PlayerNewAndInitEmpty),
 )
 def test_new_instance(request, mocker, plcls):
     logger.info(f'{request._pyfuncitem.name}()')
@@ -90,12 +84,14 @@ def test_new_instance(request, mocker, plcls):
     assert player.__new__.call_count > 0
     assert player.__init__.call_count == 1
 
-@pytest.mark.xfail
+@pytest.mark.skip(reason="__init_subclass__() hook is unimplemented in new_instance."\
+                         +"See https://github.com/alex-ber/RocketPaperScissorsGame/issues/1 for details."
+                   )
 def test_new_instance_init_subclass(request, mocker):
     logger.info(f'{request._pyfuncitem.name}()')
-    mocker.spy(plcls, '__new__')
-    mocker.spy(plcls, '__init__')
-    mocker.spy(plcls, '__init_subclass__')
+    mocker.spy(PlayerPhilosopher, '__new__')
+    mocker.spy(PlayerPhilosopher, '__init__')
+    mocker.spy(PlayerPhilosopher, '__init_subclass__')
 
     input = '.'.join([__name__, PlayerPhilosopher.__name__])
     player=new_instance(input, default_name="Nietzsche")
