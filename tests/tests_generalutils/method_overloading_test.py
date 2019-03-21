@@ -68,6 +68,17 @@ def test_overloading_str(request, mocker):
     assert namespace.importer == importer
     importer.assert_called_once_with(input)
 
+class PlayerPhilosopher:
+    def __init_subclass__(cls, default_name, **kwargs):
+        super().__init_subclass__(**kwargs)
+        logger.debug(f"Called __init_subclass({cls}, {default_name})")
+        cls.default_name = default_name
+
+
+class PlayerAustralianPhilosopher(PlayerPhilosopher, default_name="Bruce"):
+    pass
+
+
 
 if __name__ == "__main__":
     import pytest

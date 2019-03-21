@@ -10,15 +10,24 @@ class TestImporter(object):
         logger.info(f'{request._pyfuncitem.name}()')
         namespace = sys.modules[__name__]
 
-        importer = mocker.spy(namespace, 'importer')
-
         cls_name = 'pathlib.Path'
         kls = importer(cls_name)
 
         path = kls()
         logger.info(path.absolute())
 
-        assert namespace.importer == importer
+
+def test_new_instance_function(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+    #namespace = sys.modules[__name__]
+    cls_name = 'pathlib.Path.cwd'
+
+    mocker.patch.object(cls_name, autospec=True)
+
+    kls = new_instance(cls_name)
+
+    path = kls()
+    logger.info(path.absolute())
 
 
 class PlayerEmpty(object):
@@ -36,6 +45,7 @@ class PlayerInitArg(object):
 class PlayerNewAndInitEmpty(object):
     def __new__(cls, *args, **kwargs):
         self = super().__new__(cls)
+        logger.debug("PlayerNewAndInitEmpty.__new__()")
         return self
 
 class PlayerNewOnlyEmpty(object):
@@ -55,11 +65,7 @@ class PlayerNewOnlyEmptySneaky(object):
         pass
 
 
-class PlayerPhilosopher:
-    def __init_subclass__(cls, default_name, **kwargs):
-        super().__init_subclass__(**kwargs)
-        print(f"Called __init_subclass({cls}, {default_name})")
-        cls.default_name = default_name
+
 
 from abc import ABCMeta, abstractmethod
 
@@ -96,36 +102,24 @@ def test_new_instance_arg(request, mocker):
 
 @pytest.mark.parametrize(
      'plcls',
-    (PlayerEmpty, PlayerInitFull,PlayerNewOnlyEmpty, PlayerEmpty, PlayerNewOnlyEmpty,PlayerNewAndInitEmpty,
+    (PlayerEmpty, PlayerInitFull,PlayerNewOnlyEmpty, PlayerNewOnlyEmpty,PlayerNewAndInitEmpty,
      PlayerAbstractEmptyWithoutAbstractMethod, PlayerAbstractFullWithoutAbstractMethod),
-
 )
-def test_new_instance(request, mocker, plcls):
+def test_new_instance(request, plcls):
     logger.info(f'{request._pyfuncitem.name}()')
-
-    mocker.spy(plcls, '__new__')
-    mocker.spy(plcls, '__init__')
 
     input = '.'.join([__name__, plcls.__name__])
     player = new_instance(input)
+    assert player is not None
 
-    assert player.__new__.call_count > 0
-    assert player.__init__.call_count == 1
 
-@pytest.mark.skip(reason="__init_subclass__() hook is unimplemented in new_instance."\
-                         +"See https://github.com/alex-ber/RocketPaperScissorsGame/issues/1 for details."
-                   )
 def test_new_instance_init_subclass(request, mocker):
     logger.info(f'{request._pyfuncitem.name}()')
-    mocker.spy(PlayerPhilosopher, '__new__')
-    mocker.spy(PlayerPhilosopher, '__init__')
-    mocker.spy(PlayerPhilosopher, '__init_subclass__')
+    module_name, _ = __name__.rsplit(".", 1)
+    input = '.'.join([module_name, 'method_overloading_test', 'PlayerAustralianPhilosopher'])
 
-    input = '.'.join([__name__, PlayerPhilosopher.__name__])
-    player=new_instance(input, default_name="Nietzsche")
-    assert player.__new__.call_count > 0
-    assert player.__init__.call_count == 1
-    assert player.__init_subclass__.call_count == 1
+    player=new_instance(input)
+    assert player is not None
 
 
 def test_new_instance_abstract_method(request, mocker):
@@ -136,7 +130,7 @@ def test_new_instance_abstract_method(request, mocker):
 
     with pytest.raises(TypeError, match='abstract method') as excinfo:
         player = new_instance(input)
-    logger.debug((excinfo.value, excinfo.traceback))
+    logger.debug(excinfo.value, exc_info=(excinfo.type, excinfo.value, excinfo.tb))
 
 
 

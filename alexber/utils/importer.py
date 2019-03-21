@@ -27,18 +27,10 @@ def importer(target):
     return thing
 
 
-'''
-importer() method is called.
-If target is class than __new__ and __init__ hooks are called on it and result is returned.
-Note: __init_subclass__ hoook is not supported.
-'''
+
 def new_instance(target, *args, **kwargs):
     thing = importer(target)
     ret = thing
     if inspect.isclass(thing):
-        ret = thing.__new__(thing, *args)
-        if isinstance(ret, thing):
-            thing.__init__(ret, *args, **kwargs)
-        #tbd: take care of arguments __init_subclass__
-        #see https://github.com/alex-ber/RocketPaperScissorsGame/issues/1
+        ret = thing(*args, **kwargs)
     return ret
