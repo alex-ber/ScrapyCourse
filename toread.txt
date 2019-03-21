@@ -1,0 +1,9 @@
+https://github.com/astraw38/pytest-assume
+
+
+Coroutine
+http://sdiehl.github.io/gevent-tutorial/
+http://www.getoffmalawn.com/blog/playing-with-asyncio
+https://hackernoon.com/asyncio-for-the-working-python-developer-5c468e6e2e8e
+https://medium.com/python-pandemonium/asyncio-coroutine-patterns-beyond-await-a6121486656f
+https://medium.com/@yeraydiazdiaz/asyncio-coroutine-patterns-errors-and-cancellation-3bb422e961ff
