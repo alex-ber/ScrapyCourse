@@ -1,6 +1,7 @@
 
 from enum import Enum
-
+import logging
+logger = logging.getLogger(__name__)
 
 class StrAsReprMixinEnum(Enum):
     def __str__(self):

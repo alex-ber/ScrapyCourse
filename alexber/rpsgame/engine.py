@@ -13,5 +13,14 @@ del _loggerDict
 
 
 class Engine(object):
+    def __init__(self, *players):
+        self.playera = players(0)
+        self.playerb = players(1)
 
+
+    def play(self):
+        anwera = self.playera.move()
+        anwerb = self.playerb.move()
+        logging.debug(anwera)
+        logging.debug(anwerb)
 

@@ -6,9 +6,8 @@ logger = logging.getLogger(__name__)
 from alexber.utils.importer import importer, new_instance
 
 class TestImporter(object):
-    def test_imported(self, request, mocker):
+    def test_imported(self, request):
         logger.info(f'{request._pyfuncitem.name}()')
-        namespace = sys.modules[__name__]
 
         cls_name = 'pathlib.Path'
         kls = importer(cls_name)
@@ -17,13 +16,9 @@ class TestImporter(object):
         logger.info(path.absolute())
 
 
-def test_new_instance_function(request, mocker):
+def test_new_instance_function(request):
     logger.info(f'{request._pyfuncitem.name}()')
-    #namespace = sys.modules[__name__]
     cls_name = 'pathlib.Path.cwd'
-
-    mocker.patch.object(cls_name, autospec=True)
-
     kls = new_instance(cls_name)
 
     path = kls()
@@ -113,7 +108,7 @@ def test_new_instance(request, plcls):
     assert player is not None
 
 
-def test_new_instance_init_subclass(request, mocker):
+def test_new_instance_init_subclass(request):
     logger.info(f'{request._pyfuncitem.name}()')
     module_name, _ = __name__.rsplit(".", 1)
     input = '.'.join([module_name, 'method_overloading_test', 'PlayerAustralianPhilosopher'])
@@ -122,10 +117,8 @@ def test_new_instance_init_subclass(request, mocker):
     assert player is not None
 
 
-def test_new_instance_abstract_method(request, mocker):
+def test_new_instance_abstract_method(request):
     logger.info(f'{request._pyfuncitem.name}()')
-    #mock = mocker.spy(PlayerAbstractWithAbstractMethod, '__init__')
-
     input = '.'.join([__name__, PlayerAbstractWithAbstractMethod.__name__])
 
     with pytest.raises(TypeError, match='abstract method') as excinfo:
