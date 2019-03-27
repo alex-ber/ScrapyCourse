@@ -13,7 +13,7 @@ class TestImporter(object):
         kls = importer(cls_name)
 
         path = kls()
-        logger.info(path.absolute())
+        logger.info(path.resolve())
 
 
 def test_new_instance_function(request):
@@ -35,6 +35,10 @@ class PlayerInitFull(object):
 
 class PlayerInitArg(object):
     def __init__(self, first_name):
+        self.first_name = first_name
+
+class PlayerInitDefaultArg(object):
+    def __init__(self, first_name='Alex', **kwargs):
         self.first_name = first_name
 
 class PlayerNewAndInitEmpty(object):
@@ -93,6 +97,29 @@ def test_new_instance_arg(request, mocker):
     assert player.first_name == first_name
     assert player.__init__.call_count == 1
 
+
+def test_new_instance_default_arg1(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    input = '.'.join([__name__, PlayerInitDefaultArg.__name__])
+    first_name = 'Alex'
+    player=new_instance(input, first_name)
+    assert player.first_name == first_name
+
+def test_new_instance_default_arg2(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    input = '.'.join([__name__, PlayerInitDefaultArg.__name__])
+    player=new_instance(input)
+    assert player.first_name == "Alex"
+
+def test_new_instance_default_arg3(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+    mock = mocker.spy(PlayerInitDefaultArg, '__init__')
+
+    input = '.'.join([__name__, PlayerInitDefaultArg.__name__])
+    player=new_instance(input, last_name='Google')
+    assert player.first_name == "Alex"
 
 
 @pytest.mark.parametrize(

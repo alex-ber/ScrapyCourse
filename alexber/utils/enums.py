@@ -17,7 +17,6 @@ class MissingNoneMixinEnum(Enum):
 
     @classmethod
     def _missing_(cls, value):
-        # print('missing')
         # raise ValueError("%r is not a valid %s" % (value, cls.__name__))
         return None
 

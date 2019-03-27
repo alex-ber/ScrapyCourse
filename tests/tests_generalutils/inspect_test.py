@@ -142,8 +142,8 @@ def test_binding(request, f):
     sig = inspect.signature(f)
     bound_args = sig.bind(**d)
     bound_args.apply_defaults()
-    arr = bound_args.arguments
-    obj = f(**arr)
+    kwargs = bound_args.arguments
+    obj = f(**kwargs)
     assert obj is not None
 
 

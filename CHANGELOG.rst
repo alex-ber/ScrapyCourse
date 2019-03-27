@@ -6,6 +6,7 @@ TODO
 This is planened versions:
 
 0.5 Not Feature complete. Basic CLI, 1-round game. Immediate reporting. Different players.
+Limited support for players name.
 
 0.9 Not Feature complete. Tournament. Engine is not longer singleton. Reports
 are hard-wired at engine.

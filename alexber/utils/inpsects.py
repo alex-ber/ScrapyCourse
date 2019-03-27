@@ -36,6 +36,4 @@ def issetmethod(object):
     sig = inspect.signature(object)
     length = len(sig.parameters.keys())
 
-    return length==2
-
-    # d = OrderedDict()
+    return length==2    #2=|{self,param}|
