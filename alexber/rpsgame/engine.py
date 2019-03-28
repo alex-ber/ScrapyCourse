@@ -12,6 +12,8 @@ del _loggerDict
 from alexber.utils import LookUpMixinEnum, Enum
 import enum
 
+#TODO: Alex write unit tests
+#TODO: Alex write integration tests
 
 class _OrderedEnum(Enum):
 
@@ -91,11 +93,12 @@ class RockScissorsPaperEnum(LookUpMixinEnum, _OrderedEnum):
 class Engine(object):
     #TODO: add name supports
     def __init__(self, **kwargs):
-        self.player_a = kwargs['player_a']
-        self.player_b = kwargs['player_b']
-        #TODO: consult with player what is his name (optional method/property name)
+        # TODO: consult with player what is his name (optional method/property name)
         self.name_player_a = kwargs['name_player_a']
         self.name_player_b = kwargs['name_player_b']
+
+        self.player_a = kwargs['player_a']
+        self.player_b = kwargs['player_b']
 
 
     def play(self):

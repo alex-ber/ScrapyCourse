@@ -32,7 +32,5 @@ def new_instance(target, *args, **kwargs):
     thing = importer(target)
     ret = thing
     if inspect.isclass(thing):
-        #TODO: Alex
-        ret = thing()
-        #ret = thing(*args, **kwargs)
+        ret = thing(*args, **kwargs)
     return ret

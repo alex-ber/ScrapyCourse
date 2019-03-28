@@ -70,5 +70,4 @@ def test_args_parse_explicit_args(request, arg_parse_param):
     assert exp_d==d
 
 if __name__ == "__main__":
-
     pytest.main([__file__])

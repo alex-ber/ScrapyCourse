@@ -38,7 +38,7 @@ class PlayerInitArg(object):
         self.first_name = first_name
 
 class PlayerInitDefaultArg(object):
-    def __init__(self, first_name='Alex', **kwargs):
+    def __init__(self, first_name='John', **kwargs):
         self.first_name = first_name
 
 class PlayerNewAndInitEmpty(object):
@@ -92,7 +92,7 @@ def test_new_instance_arg(request, mocker):
     mock = mocker.spy(PlayerInitArg, '__init__')
 
     input = '.'.join([__name__, PlayerInitArg.__name__])
-    first_name = 'Alex'
+    first_name = 'John'
     player=new_instance(input, first_name)
     assert player.first_name == first_name
     assert player.__init__.call_count == 1
@@ -102,7 +102,7 @@ def test_new_instance_default_arg1(request, mocker):
     logger.info(f'{request._pyfuncitem.name}()')
 
     input = '.'.join([__name__, PlayerInitDefaultArg.__name__])
-    first_name = 'Alex'
+    first_name = 'John'
     player=new_instance(input, first_name)
     assert player.first_name == first_name
 
@@ -111,7 +111,7 @@ def test_new_instance_default_arg2(request, mocker):
 
     input = '.'.join([__name__, PlayerInitDefaultArg.__name__])
     player=new_instance(input)
-    assert player.first_name == "Alex"
+    assert player.first_name == "John"
 
 def test_new_instance_default_arg3(request, mocker):
     logger.info(f'{request._pyfuncitem.name}()')
@@ -119,7 +119,7 @@ def test_new_instance_default_arg3(request, mocker):
 
     input = '.'.join([__name__, PlayerInitDefaultArg.__name__])
     player=new_instance(input, last_name='Google')
-    assert player.first_name == "Alex"
+    assert player.first_name == "John"
 
 
 @pytest.mark.parametrize(

@@ -1,0 +1,5 @@
+treeroot:
+    playera:
+        cls: alexber.rpsgame.players.ConstantPlayer
+    playerb:
+        cls: alexber.rpsgame.players.ConstantPlayer

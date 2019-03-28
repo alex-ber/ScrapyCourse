@@ -1,0 +1,1 @@
+from alexber.rpsgame.app import conf
