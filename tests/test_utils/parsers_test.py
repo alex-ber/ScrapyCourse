@@ -1,11 +1,12 @@
 import logging
 import pytest
 
-from alexber.utils.parsers import ConfigParser, ArgumentParser
+from alexber.utils.parsers import ConfigParser, ArgumentParser, safe_eval
 
 logger = logging.getLogger(__name__)
 from pathlib import Path
-
+from decimal import Decimal
+from datetime import datetime
 
 
 def test_parse_config(request):
@@ -68,6 +69,35 @@ def test_args_parse_explicit_args(request, arg_parse_param):
 
     d = parser.as_dict(args=sys_args)
     assert exp_d==d
+
+
+@pytest.mark.parametrize(
+     'value, exp_value, exp_type',
+
+    [
+        ('John', 'John', str),
+        ('alexber.rpsgame.players.ConstantPlayer', 'alexber.rpsgame.players.ConstantPlayer', str),
+        ('1000', 1000, int),
+        ('0.1', 0.1, float),
+        ('0.0', 0.0, float),
+        ('-0.0', 0.0, float),
+        ('-5', -5, int),
+        ('0.1', None, Decimal),  #Not Supprted
+        ('2019-04-01 16:31:51.513383', None, datetime),  #Not Supprted
+
+    ]
+)
+def test_convert(request, value, exp_value, exp_type):
+    logger.info(f'{request._pyfuncitem.name}()')
+    if exp_value is None:
+        pytest.skip(f"Type {exp_type} is not supported. Skipping.")
+
+
+    result = safe_eval(value)
+    type_result = type(result)
+    pytest.assume(exp_value == result)
+    pytest.assume(exp_type == type_result)
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

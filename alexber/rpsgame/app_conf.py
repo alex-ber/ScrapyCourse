@@ -2,10 +2,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from alexber.utils.parsers import ConfigParser, ArgumentParser
+from alexber.utils.parsers import ConfigParser, ArgumentParser, safe_eval as _convert
 from pathlib import Path
 from collections import OrderedDict
-import ast
 
 PLAYER_CLS_KEY ='cls'
 NAME_PLAYER_A_KEY='name'
@@ -20,22 +19,6 @@ _WHITELIST_PREFIX = {'init', 'prop', 'set'}
 _WHITELIST_FLAT_PREFIX = {'playera', 'playerb'}
 
 #TODO: Alex write unit tests
-
-#insipred by https://stackoverflow.com/a/14258151/1137529
-#
-def _convert(value):
-    '''
-    The purpose of this function is convert numbers from str to correct type.
-    This function support convertion of built-in Python number to correct type (int, float)
-    This function doesn't support decimal.Decimal.
-    '''
-    try:
-        ret = ast.literal_eval(value)
-    except ValueError:
-        ret = value
-    return ret
-
-
 
 
 
@@ -66,6 +49,30 @@ def _mask_key(key):
 
 
 def parse_dict(d, implicit_convert=True):
+    """
+    This function is intented also for external use.
+    For example, if we have configuration in JSON/YML, etc.
+    It is better to provide exact type for the values (JSON and YML parser do it easily)
+    and not to use implicit_convert.
+
+    This function assume following structure of the dict d:
+
+    engine:
+        cls: ...
+        ...
+    playera:
+        cls: ...
+        ...
+    playerb:
+        cls: ...
+        ...
+
+    By default implicit_convert is True and this function will try to guess it.
+
+    :param d: dict
+    :param implicit_convert: whether to guess the value type and to convert it. Default True.
+    :return: ready to use dict
+    """
     dd = OrderedDict()
     playera_dd = OrderedDict()
     playerb_dd = OrderedDict()
@@ -74,6 +81,7 @@ def parse_dict(d, implicit_convert=True):
 
     playera_d = d.get(PLAYER_A_KEY, {})
     playerb_d = d.get(PLAYER_B_KEY, {})
+    # TODO: engine key
 
     for key, value in playera_d.items():
         key = _mask_key(key)
@@ -95,9 +103,29 @@ def parse_dict(d, implicit_convert=True):
 
 
 def parse_flat_dict(d, implicit_convert=True):
+    """
+    This function can be in external use.
+    It's main usage is to parse command line arguments.
+    If for what ever reason, your ML is flat (like key:value in the command line arguments),
+    you can use this function.
+
+    This function assume following structure of the dict d:
+
+    engine.cls=...,
+    playera.cls=...,
+    playerb.cls=...,
+
+    By default implicit_convert is True and this function will try to guess it.
+
+    :param d:
+    :param implicit_convert: whether to guess the value type and to convert it. Default True.
+    :return: ready to use dict
+    """
+
     dd = OrderedDict()
     dd[PLAYER_A_KEY] = OrderedDict()
     dd[PLAYER_B_KEY] = OrderedDict()
+    # TODO: engine key
 
     for flat_key, value in d.items():
         if '.' not in flat_key:
@@ -122,8 +150,17 @@ def parse_flat_dict(d, implicit_convert=True):
 
 
 def parse_sys_args(argumentParser=None, args=None):
+    """
+    This function can be in external use.
+    This function parses command line arguments.
+
+    :param argumentParser:
+    :param args: if not None, suppresses sys.args
+    :return:
+    """
     if argumentParser is None:
         argumentParser = ArgumentParser()
+    #TODO: engine key
     argumentParser.add_argument("--config_file", nargs='?', dest='config_file', default='config.ini',
                                 const='config.ini')
     params, unknown_arg = argumentParser.parse_known_args(args=args)
@@ -134,6 +171,14 @@ def parse_sys_args(argumentParser=None, args=None):
 
 
 def parse_ini(config_file='config.ini'):
+    """
+    This function can be in external use.
+    This function parses ini file.
+
+    :param config_file: path to the ini file. Default value is config.ini. Can be str or os.PathLike.
+    :return: dict ready to use
+    """
+
     parser = ConfigParser()
     full_path = Path(config_file).resolve() #relative to cwd
 
@@ -143,6 +188,22 @@ def parse_ini(config_file='config.ini'):
     return dd
 
 def parse_config(args=None):
+    """
+    This function can be in external use, but it is not intended for.
+    This function parses command line arguments.
+    Than it parse ini file.
+    Command line arguemnts overrides ini file arguments.
+
+    In more detail, command line arguments of the form --key=value are parsed first.
+    If exists --config_file it's value is used to search for ini file.
+    if --config_file is absent, 'config.ini' is used for ini file.
+    If ini file is not found, only command line arguments are used.
+    If ini file is found, both arguments are used, while
+    command line arguments overrides ini arguments.
+
+    :param args: if not None, suppresses sys.args
+    :return: dict ready to use
+    """
     params, cli_dd = parse_sys_args(args=args)
     config_dd = parse_ini(params.config_file)
     dd = {**config_dd, **cli_dd}

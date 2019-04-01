@@ -1,28 +1,29 @@
 import logging.config
 
-import inspect
-from alexber.utils.importer import new_instance
-from alexber.utils.inpsects import issetdescriptor, issetmethod
-from alexber.rpsgame.app_create_player import create_player
+
+from alexber.rpsgame.app_create_instance import create_instance, _checkParam
 
 #TODO: Alex write unit tests
 #TODO: Alex write integration tests
 
 
-#only for namepsace definition
-class conf(object):
-    from alexber.rpsgame.app_conf import parse_dict, parse_flat_dict, \
-        parse_sys_args, parse_ini, parse_config, \
-        PLAYER_CLS_KEY, NAME_PLAYER_A_KEY, NAME_PLAYER_B_KEY, \
-        PLAYER_A_KEY, PLAYER_B_KEY, DEFAULT_NAME_PLAYER_A, DEFAULT_NAME_PLAYER_B
-    pass
+from alexber.rpsgame import app_conf as conf
 
-def _checkParam(obj, key):
-    if (obj is None):
-        ValueError(f"run() expectes paramater {key}")
 
 
 def run(**kwargs):
+    """
+    This method recieved all conf params in kwargs.
+    All unexpected values will be ignored.
+    It is expected that value type is correct.
+    No conversion on the value of the dict kwargs will be applied.
+    This method will built playerA, playerB, engine,
+    and run engine with these players.
+
+    Please, consult alexber.rpsgame.app_conf in order to construct kwargs.
+    Command-line argument and ini-file are suppored out of the box.
+    JSON/YML, etc. can be easiliy handled also.
+    """
     from alexber.rpsgame.engine import Engine
 
     #filter out unrelated params without implicit_convert
@@ -43,8 +44,9 @@ def run(**kwargs):
     if name_player_b is None:
         name_player_b = conf.DEFAULT_NAME_PLAYER_B
 
-    player_a = create_player(**playera_d)
-    player_b = create_player(**playerb_d)
+    #TODO: engine key
+    player_a = create_instance(**playera_d)
+    player_b = create_instance(**playerb_d)
 
 
 
@@ -57,6 +59,10 @@ def run(**kwargs):
 
 
 def main(args=None):
+    """
+    main method
+    :param args: if not None, suppresses sys.args
+    """
     dd = conf.parse_config(args)
     run(**dd)
 

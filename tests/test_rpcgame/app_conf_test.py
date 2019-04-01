@@ -9,26 +9,6 @@ import yaml
 import json
 
 
-@pytest.mark.parametrize(
-     'value, exp_value, exp_type',
-
-    [
-        ('John', 'John', str),
-        ('alexber.rpsgame.players.ConstantPlayer', 'alexber.rpsgame.players.ConstantPlayer', str),
-        ('1000', 1000, int),
-        ('0.1', 0.1, float),
-        ('0.0', 0.0, float),
-        ('-0.0', 0.0, float),
-        ('-5', -5, int),
-
-    ]
-)
-def test_convert(request, value, exp_value, exp_type):
-    logger.info(f'{request._pyfuncitem.name}()')
-    result = app_conf._convert(value)
-    type_result = type(result)
-    pytest.assume(exp_value == result)
-    pytest.assume(exp_type == type_result)
 
 
 def test_parse_yaml(request):

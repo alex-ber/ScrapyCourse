@@ -13,8 +13,8 @@ from alexber.rpsgame import app_conf as conf
 
 
 def _checkParam(obj, key):
-    if (obj is None):
-        ValueError(f"run() expectes paramater {key}")
+    if (obj is None or not obj):
+        raise ValueError(f"run() expectes paramater {key}")
 
 def _inject_properties(player, **kwargs):
     #__new__() could subsitute __class__, so re-evaluate it
@@ -75,9 +75,9 @@ def _inject_setters(player, **kwargs):
 
 
 
-def create_player(**kwargs):
+def create_instance(**kwargs):
     '''This is mini DI Framework.
-    https://pythonhosted.org/injector/ was consider and rejected
+    Existing DI Frameworks, such as https://pythonhosted.org/injector/ were consider and rejected
     as overcomplicated for defying players
     '''
     plcls = kwargs.pop(conf.PLAYER_CLS_KEY, None)
