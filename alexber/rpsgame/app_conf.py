@@ -6,13 +6,17 @@ from alexber.utils.parsers import ConfigParser, ArgumentParser, safe_eval as _co
 from pathlib import Path
 from collections import OrderedDict
 
-PLAYER_CLS_KEY ='cls'
+
+CLS_KEY = 'cls'
 NAME_PLAYER_A_KEY='name'
 NAME_PLAYER_B_KEY='name'
 PLAYER_A_KEY='playera'
 PLAYER_B_KEY='playerb'
 DEFAULT_NAME_PLAYER_A = 'Player A'
 DEFAULT_NAME_PLAYER_B = 'Player B'
+ENGINE_KEY = 'engine'
+DEFAULT_ENGINE_CLS = 'alexber.rpsgame.engine.Engine'
+DEFAULT_PLAYER_CLS = 'alexber.rpsgame.players.DefaultPlayer'
 
 _WHITELIST_FULL_NAMES = {'cls', 'name'}
 _WHITELIST_PREFIX = {'init', 'prop', 'set'}
@@ -73,22 +77,19 @@ def parse_dict(d, implicit_convert=True):
     :param implicit_convert: whether to guess the value type and to convert it. Default True.
     :return: ready to use dict
     """
-    dd = OrderedDict()
-    playera_dd = OrderedDict()
-    playerb_dd = OrderedDict()
-    dd[PLAYER_A_KEY] = playera_dd
-    dd[PLAYER_B_KEY] = playerb_dd
 
+    dd = OrderedDict()
     playera_d = d.get(PLAYER_A_KEY, {})
     playerb_d = d.get(PLAYER_B_KEY, {})
-    # TODO: engine key
+    engine_d =  d.get(ENGINE_KEY,   {})
 
     for key, value in playera_d.items():
         key = _mask_key(key)
         if key is None:
             logger.info(f"Skipping key {key}")
             continue
-        playera_dd[key] = _mask_value(value, implicit_convert)
+        #playera_dd[key] = _mask_value(value, implicit_convert)
+        dd.setdefault(PLAYER_A_KEY, OrderedDict())[key] = _mask_value(value, implicit_convert)
 
 
     for key, value in playerb_d.items():
@@ -96,8 +97,16 @@ def parse_dict(d, implicit_convert=True):
         if key is None:
             logger.info(f"Skipping key {key}")
             continue
-        playerb_dd[key] = _mask_value(value, implicit_convert)
+        #playerb_dd[key] = _mask_value(value, implicit_convert)
+        dd.setdefault(PLAYER_B_KEY, OrderedDict())[key] = _mask_value(value, implicit_convert)
 
+    for key, value in engine_d.items():
+        key = _mask_key(key)
+        if key is None:
+            logger.info(f"Skipping key {key}")
+            continue
+        #engine_d[key] = _mask_value(value, implicit_convert)
+        dd.setdefault(ENGINE_KEY, OrderedDict())[key] = _mask_value(value, implicit_convert)
     return dd
 
 
@@ -123,9 +132,6 @@ def parse_flat_dict(d, implicit_convert=True):
     """
 
     dd = OrderedDict()
-    dd[PLAYER_A_KEY] = OrderedDict()
-    dd[PLAYER_B_KEY] = OrderedDict()
-    # TODO: engine key
 
     for flat_key, value in d.items():
         if '.' not in flat_key:
@@ -143,7 +149,7 @@ def parse_flat_dict(d, implicit_convert=True):
             logger.info(f"Skipping key {flat_key}")
             continue
 
-        dd[key][real_key] = _mask_value(value, implicit_convert)
+        dd.setdefault(key, OrderedDict())[real_key] = _mask_value(value, implicit_convert)
 
 
     return dd
@@ -160,7 +166,6 @@ def parse_sys_args(argumentParser=None, args=None):
     """
     if argumentParser is None:
         argumentParser = ArgumentParser()
-    #TODO: engine key
     argumentParser.add_argument("--config_file", nargs='?', dest='config_file', default='config.ini',
                                 const='config.ini')
     params, unknown_arg = argumentParser.parse_known_args(args=args)
@@ -211,5 +216,4 @@ def parse_config(args=None):
 
 
 
-if __name__ == '__main__':
-    main()
+

@@ -80,8 +80,8 @@ def create_instance(**kwargs):
     Existing DI Frameworks, such as https://pythonhosted.org/injector/ were consider and rejected
     as overcomplicated for defying players
     '''
-    plcls = kwargs.pop(conf.PLAYER_CLS_KEY, None)
-    _checkParam(plcls, conf.PLAYER_CLS_KEY)
+    plcls = kwargs.pop(conf.CLS_KEY, None)
+    _checkParam(plcls, conf.CLS_KEY)
 
     player = new_instance(plcls, **kwargs)
     _inject_properties(player, **kwargs)

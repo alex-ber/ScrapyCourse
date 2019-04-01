@@ -1,14 +1,14 @@
 import logging.config
 
 
-from alexber.rpsgame.app_create_instance import create_instance, _checkParam
+from alexber.rpsgame.app_create_instance import create_instance
 
 #TODO: Alex write unit tests
 #TODO: Alex write integration tests
 
 
 from alexber.rpsgame import app_conf as conf
-
+from collections import OrderedDict
 
 
 def run(**kwargs):
@@ -31,30 +31,46 @@ def run(**kwargs):
     kwargs = conf.parse_dict(kwargs, implicit_convert=False)
 
     playera_d = kwargs.pop(conf.PLAYER_A_KEY, None)
-    _checkParam(playera_d, conf.PLAYER_A_KEY)
+    is_blank_playera_d = playera_d is None or not playera_d
+    playerb_d = kwargs.pop(conf.PLAYER_B_KEY, None)
+    is_blank_playerb_d = playerb_d is None or not playerb_d
+
+    if is_blank_playera_d and is_blank_playerb_d:
+        raise ValueError("Both players can't be empty")
+
+    if is_blank_playera_d:
+        playera_d = OrderedDict()
+        playera_d[conf.CLS_KEY] = conf.DEFAULT_PLAYER_CLS
+
+    if is_blank_playerb_d:
+        playerb_d = OrderedDict()
+        playerb_d[conf.CLS_KEY] = conf.DEFAULT_PLAYER_CLS
 
     name_player_a = playera_d.get(conf.NAME_PLAYER_A_KEY, None)
     if name_player_a is None:
         name_player_a = conf.DEFAULT_NAME_PLAYER_A
 
-    playerb_d = kwargs.pop(conf.PLAYER_B_KEY, None)
-    _checkParam(playerb_d, conf.PLAYER_B_KEY)
 
-    name_player_b = playera_d.get(conf.NAME_PLAYER_B_KEY, None)
+    name_player_b = playerb_d.get(conf.NAME_PLAYER_B_KEY, None)
     if name_player_b is None:
         name_player_b = conf.DEFAULT_NAME_PLAYER_B
 
-    #TODO: engine key
+    engine_d = kwargs.pop(conf.ENGINE_KEY, None)
+
+    if engine_d is None:
+        engine_d = OrderedDict()
+        engine_d[conf.CLS_KEY] = conf.DEFAULT_ENGINE_CLS
+
     player_a = create_instance(**playera_d)
     player_b = create_instance(**playerb_d)
 
+    engine_d['player_a'] = player_a
+    engine_d['player_b'] = player_b
+    engine_d['name_player_a'] = name_player_a
+    engine_d['name_player_b'] = name_player_b
 
 
-    the_engine = Engine(player_a=player_a,
-            player_b=player_b,
-            name_player_a=name_player_a,
-            name_player_b=name_player_b,
-            **kwargs)
+    the_engine = create_instance(**engine_d)
     the_engine.play()
 
 
