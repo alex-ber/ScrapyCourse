@@ -8,7 +8,7 @@ from alexber.rpsgame import app_conf
 import yaml
 import json
 
-
+#TODO: Alex unit-tests +1000
 
 
 def test_parse_yaml(request):
