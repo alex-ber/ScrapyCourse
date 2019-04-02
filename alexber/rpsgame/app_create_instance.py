@@ -4,8 +4,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 import inspect
-from alexber.utils.importer import new_instance
+from alexber.utils.importer import new_instance, importer
 from alexber.utils.inpsects import issetdescriptor, issetmethod
+from collections import OrderedDict
 
 from alexber.rpsgame import app_conf as conf
 
@@ -13,7 +14,7 @@ from alexber.rpsgame import app_conf as conf
 
 
 def _checkParam(obj, key):
-    if (obj is None or not obj):
+    if (obj is None):
         raise ValueError(f"run() expectes paramater {key}")
 
 def _inject_properties(player, **kwargs):
@@ -22,9 +23,6 @@ def _inject_properties(player, **kwargs):
     # finding @property.fset
     results = inspect.getmembers(plcls, predicate=issetdescriptor)
     d = {key: value for (key, value) in results}
-
-    prop = None
-    prop_setter = None
 
     for name, value in kwargs.items():
         if not name.startswith("prop."):
@@ -41,20 +39,18 @@ def _inject_properties(player, **kwargs):
         if prop_setter is None:
             raise ValueError(f"Property {name} found, but it doesn't support setter.")
 
-        prop_setter(self=player, value=value)
+        prop_setter(player, value)
 
 
 
 #undocumented feature: you can actually call any method with 1 parameter
+#Limitation: no special treatment for default parameters
 def _inject_setters(player, **kwargs):
     #__new__() could subsitute __class__, so re-evaluate it
     plcls = type(player)
     # finding @property.fset
     results = inspect.getmembers(plcls, predicate=issetmethod)
     d = {key: value for key, value in results}
-
-    prop = None
-    prop_setter = None
 
     for name, value in kwargs.items():
         if not name.startswith("set."):
@@ -83,7 +79,18 @@ def create_instance(**kwargs):
     plcls = kwargs.pop(conf.CLS_KEY, None)
     _checkParam(plcls, conf.CLS_KEY)
 
-    player = new_instance(plcls, **kwargs)
+    d = OrderedDict()
+
+    for name, value in kwargs.items():
+        if not name.startswith("init."):
+            logger.debug("Skipping {name}, doesn't have prefix 'init'")
+            continue
+
+        real_name = name[len("init."):]
+        d[real_name] = value
+
+
+    player = new_instance(plcls, **d)
     _inject_properties(player, **kwargs)
     _inject_setters(player, **kwargs)
 

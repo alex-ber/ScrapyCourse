@@ -90,7 +90,8 @@ def test_args_parse_explicit_args(request, arg_parse_param):
 def test_convert(request, value, exp_value, exp_type):
     logger.info(f'{request._pyfuncitem.name}()')
     if exp_value is None:
-        pytest.skip(f"Type {exp_type} is not supported. Skipping.")
+        logger.debug(f"Type {exp_type} is not supported.")
+        return
 
 
     result = safe_eval(value)

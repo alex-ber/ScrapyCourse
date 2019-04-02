@@ -2,6 +2,7 @@ import logging.config
 
 
 from alexber.rpsgame.app_create_instance import create_instance
+from alexber.rpsgame.app_create_instance import importer
 
 #TODO: Alex write unit tests
 #TODO: Alex write integration tests
@@ -30,48 +31,21 @@ def run(**kwargs):
     #if you want to convert values do it explictely
     kwargs = conf.parse_dict(kwargs, implicit_convert=False)
 
+    engine_str = kwargs.pop(conf.ENGINE_KEY, None)
+    if engine_str is None:
+        engine_str = conf.DEFAULT_ENGINE_CLS
+    engine_cls = importer(engine_str)
+
     playera_d = kwargs.pop(conf.PLAYER_A_KEY, None)
-    is_blank_playera_d = playera_d is None or not playera_d
     playerb_d = kwargs.pop(conf.PLAYER_B_KEY, None)
-    is_blank_playerb_d = playerb_d is None or not playerb_d
 
-    if is_blank_playera_d and is_blank_playerb_d:
-        raise ValueError("Both players can't be empty")
-
-    if is_blank_playera_d:
-        playera_d = OrderedDict()
-        playera_d[conf.CLS_KEY] = conf.DEFAULT_PLAYER_CLS
-
-    if is_blank_playerb_d:
-        playerb_d = OrderedDict()
-        playerb_d[conf.CLS_KEY] = conf.DEFAULT_PLAYER_CLS
-
-    name_player_a = playera_d.get(conf.NAME_PLAYER_A_KEY, None)
-    if name_player_a is None:
-        name_player_a = conf.DEFAULT_NAME_PLAYER_A
-
-
-    name_player_b = playerb_d.get(conf.NAME_PLAYER_B_KEY, None)
-    if name_player_b is None:
-        name_player_b = conf.DEFAULT_NAME_PLAYER_B
-
-    engine_d = kwargs.pop(conf.ENGINE_KEY, None)
-
-    if engine_d is None:
-        engine_d = OrderedDict()
-        engine_d[conf.CLS_KEY] = conf.DEFAULT_ENGINE_CLS
-
-    player_a = create_instance(**playera_d)
-    player_b = create_instance(**playerb_d)
-
-    engine_d['player_a'] = player_a
-    engine_d['player_b'] = player_b
-    engine_d['name_player_a'] = name_player_a
-    engine_d['name_player_b'] = name_player_b
-
-
-    the_engine = create_instance(**engine_d)
+    the_engine = engine_cls.from_configuration(playera_d=playera_d,
+                                  playerb_d=playerb_d,
+                                  **kwargs)
     the_engine.play()
+
+
+
 
 
 def main(args=None):
