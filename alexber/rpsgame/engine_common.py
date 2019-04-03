@@ -12,8 +12,6 @@ del _loggerDict
 from alexber.utils import LookUpMixinEnum, Enum
 import enum
 
-#TODO: Alex write unit tests
-#TODO: Alex write integration tests
 
 class _OrderedEnum(Enum):
 

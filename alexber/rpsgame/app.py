@@ -1,15 +1,11 @@
 import logging.config
 
-
-from alexber.rpsgame.app_create_instance import create_instance
+from alexber.rpsgame import app_conf as conf
 from alexber.rpsgame.app_create_instance import importer
 
-#TODO: Alex write unit tests
-#TODO: Alex write integration tests
 
 
-from alexber.rpsgame import app_conf as conf
-from collections import OrderedDict
+# TODO: Alex write integration tests
 
 
 def run(**kwargs):
@@ -25,7 +21,6 @@ def run(**kwargs):
     Command-line argument and ini-file are suppored out of the box.
     JSON/YML, etc. can be easiliy handled also.
     """
-    from alexber.rpsgame.engine import Engine
 
     #filter out unrelated params without implicit_convert
     #if you want to convert values do it explictely
