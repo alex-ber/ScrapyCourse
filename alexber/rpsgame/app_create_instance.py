@@ -10,7 +10,6 @@ from collections import OrderedDict
 
 from alexber.rpsgame import app_conf as conf
 
-#TODO: Alex write unit tests
 
 
 def _checkParam(obj, key):

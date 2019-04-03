@@ -22,8 +22,6 @@ _WHITELIST_FULL_NAMES = {'cls', 'name'}
 _WHITELIST_PREFIX = {'init', 'prop', 'set'}
 _WHITELIST_FLAT_PREFIX = {'playera', 'playerb'}
 
-#TODO: Alex write unit tests
-
 
 
 def _mask_value(value, implicit_convert):
