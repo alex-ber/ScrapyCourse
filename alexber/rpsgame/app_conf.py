@@ -89,7 +89,8 @@ def parse_dict(d, implicit_convert=True):
             logger.info(f"Skipping key {key}")
             continue
         #playera_dd[key] = _mask_value(value, implicit_convert)
-        dd.setdefault(PLAYER_A_KEY, OrderedDict())[key] = _mask_value(value, implicit_convert)
+        inner_d = dd.setdefault(PLAYER_A_KEY, OrderedDict())
+        inner_d[key] = _mask_value(value, implicit_convert)
 
 
     for key, value in playerb_d.items():
@@ -98,7 +99,8 @@ def parse_dict(d, implicit_convert=True):
             logger.info(f"Skipping key {key}")
             continue
         #playerb_dd[key] = _mask_value(value, implicit_convert)
-        dd.setdefault(PLAYER_B_KEY, OrderedDict())[key] = _mask_value(value, implicit_convert)
+        inner_d = dd.setdefault(PLAYER_B_KEY, OrderedDict())
+        inner_d[key] = _mask_value(value, implicit_convert)
 
     for key, value in engine_d.items():
         key = _mask_key(key)
@@ -106,7 +108,8 @@ def parse_dict(d, implicit_convert=True):
             logger.info(f"Skipping key {key}")
             continue
         #engine_d[key] = _mask_value(value, implicit_convert)
-        dd.setdefault(ENGINE_KEY, OrderedDict())[key] = _mask_value(value, implicit_convert)
+        inner_d = dd.setdefault(ENGINE_KEY, OrderedDict())
+        inner_d[key] = _mask_value(value, implicit_convert)
     return dd
 
 
@@ -149,7 +152,8 @@ def parse_flat_dict(d, implicit_convert=True):
             logger.info(f"Skipping key {flat_key}")
             continue
 
-        dd.setdefault(key, OrderedDict())[real_key] = _mask_value(value, implicit_convert)
+        innder_d = dd.setdefault(key, OrderedDict())
+        innder_d[real_key] = _mask_value(value, implicit_convert)
 
 
     return dd
@@ -211,7 +215,9 @@ def parse_config(args=None):
     """
     params, cli_dd = parse_sys_args(args=args)
     config_dd = parse_ini(params.config_file)
-    dd = {**config_dd, **cli_dd}
+    dd = OrderedDict()
+    dd.update(config_dd)
+    dd.update(cli_dd)
     return dd
 
 
