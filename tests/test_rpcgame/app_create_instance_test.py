@@ -102,10 +102,10 @@ def test_new_instance_prop(request, mocker, fixed_type):
 def test_new_instance_prop_read_only(request, mocker, fixed_type):
     logger.info(f'{request._pyfuncitem.name}()')
 
-    #faking type() to return expceted type of the Mock
-    mocker.patch('alexber.rpsgame.app_create_instance.type', side_effect=fixed_type, create=True)
-
     exp_name = 'Jim'
+
+    #Is there a way to force PropertyMock to have only setter?
+    #it's easier to not to use Mock in this case
 
     d = OrderedDict()
     plcls = '.'.join([__name__, PlayerReadOnlyProp.__name__])
@@ -151,13 +151,7 @@ def test_new_instance_setter(request, mocker, fixed_type, fixed_inspect_signatur
 def test_new_instance_all(request, mocker, fixed_type, fixed_inspect_signature):
     logger.info(f'{request._pyfuncitem.name}()')
 
-    #faking type() to return expcted type of the Mock
-    mocker.patch('alexber.rpsgame.app_create_instance.type', side_effect=fixed_type, create=True)
-    # faking inspect.signature() to return expected signature of the Mock
-    from alexber.utils.inspects import inspect as _inspect
-    mocker.patch.object(_inspect, 'signature', side_effect=fixed_inspect_signature, autospec=True)
     exp_name = 'Jim'
-
 
     d = OrderedDict()
     plcls = '.'.join([__name__, PlayerExample.__name__])
