@@ -118,6 +118,7 @@ def test_new_instance_prop_read_only(request, mocker, fixed_type):
     pytest.assume(exp_name == player._name)
 
 
+
 def test_new_instance_setter(request, mocker, fixed_type, fixed_inspect_signature):
     logger.info(f'{request._pyfuncitem.name}()')
 
@@ -136,7 +137,7 @@ def test_new_instance_setter(request, mocker, fixed_type, fixed_inspect_signatur
     d['.'.join([set_prefix, 'set_first_name'])] = exp_name
 
     mock_cls = mocker.patch(plcls, autospec=True)
-    mock_setter = mocker.MagicMock(spec_set=lambda a,b:None)
+    mock_setter = mocker.create_autospec(lambda a,b:None)
     mock_cls.set_first_name = mock_setter
 
 
@@ -163,7 +164,7 @@ def test_new_instance_all(request, mocker, fixed_type, fixed_inspect_signature):
 
     #can't mock __init__ method
     #mock_cls = mocker.patch(plcls, autospec=True)
-    # mock_init = mocker.MagicMock(spec_set=PlayerInitArg.__init__)
+    #mock_init = mocker.create_autospec(PlayerInitArg.__init__)
 
     player = create_instance(**d)
 
