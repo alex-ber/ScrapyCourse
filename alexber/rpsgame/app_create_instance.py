@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 import inspect
 from alexber.utils.importer import new_instance, importer
-from alexber.utils.inpsects import issetdescriptor, issetmethod
+from alexber.utils.inspects import issetdescriptor, issetmethod
 from collections import OrderedDict
 
 from alexber.rpsgame import app_conf as conf
@@ -26,7 +26,7 @@ def _inject_properties(player, **kwargs):
 
     for name, value in kwargs.items():
         if not name.startswith("prop."):
-            logger.debug("Skipping {name}, doesn't have prefix 'prop'")
+            logger.debug(f"Skipping {name}, doesn't have prefix 'prop'")
             continue
 
         real_name = name[len("prop."):]
@@ -54,7 +54,7 @@ def _inject_setters(player, **kwargs):
 
     for name, value in kwargs.items():
         if not name.startswith("set."):
-            logger.debug("Skipping {name}, doesn't have prefix 'set'")
+            logger.debug(f"Skipping {name}, doesn't have prefix 'set'")
             continue
 
         real_name = name[len("set."):]
@@ -62,11 +62,11 @@ def _inject_setters(player, **kwargs):
         if real_name not in d:
             raise ValueError(f"Setter {name} not found in the class {plcls}")
 
-        setter = d.pop(name)  # safe
+        setter = d.pop(real_name)  # safe
         if setter is None: # just in case
             raise ValueError(f"Setter {name} is None")
 
-        setter(self=player, value=value)
+        setter(player, value)
 
 
 
@@ -83,7 +83,7 @@ def create_instance(**kwargs):
 
     for name, value in kwargs.items():
         if not name.startswith("init."):
-            logger.debug("Skipping {name}, doesn't have prefix 'init'")
+            logger.debug(f"Skipping {name}, doesn't have prefix 'init'")
             continue
 
         real_name = name[len("init."):]

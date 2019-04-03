@@ -1,7 +1,7 @@
 import logging
 import pytest
 import inspect
-from alexber.utils.inpsects import issetdescriptor, issetmethod
+from alexber.utils.inspects import issetdescriptor, issetmethod
 from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
