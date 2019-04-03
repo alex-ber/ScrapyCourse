@@ -15,6 +15,13 @@ set_prefix = 'set'
 class PlayerEmpty(object):
     pass
 
+class PlayerReadOnlyProp(object):
+
+    def name(self, name):
+        self._name = name
+
+    name = property(fset=name)
+
 
 class PlayerInitFull(object):
     def __init__(self, *args, **kwargs):
@@ -91,6 +98,24 @@ def test_new_instance_prop(request, mocker, fixed_type):
     pytest.assume(exp_name == name)
     pytest.assume(player is not None)
 
+
+def test_new_instance_prop_read_only(request, mocker, fixed_type):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    #faking type() to return expceted type of the Mock
+    mocker.patch('alexber.rpsgame.app_create_instance.type', side_effect=fixed_type, create=True)
+
+    exp_name = 'Jim'
+
+    d = OrderedDict()
+    plcls = '.'.join([__name__, PlayerReadOnlyProp.__name__])
+    d[app_conf.CLS_KEY] = plcls
+    d['.'.join([prop_prefix, 'name'])] = exp_name
+
+    player = create_instance(**d)
+
+    pytest.assume(player is not None)
+    pytest.assume(exp_name == player._name)
 
 
 def test_new_instance_setter(request, mocker, fixed_type, fixed_inspect_signature):
