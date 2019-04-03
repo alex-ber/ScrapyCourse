@@ -53,9 +53,17 @@ def test_run(request, mocker):
          'playerb': {'cls': 'alexber.rpsgame.players.ConstantPlayer'},
          }
 
+    mocker.spy(app_conf, 'parse_dict')
     mock_cls = mocker.patch(app_conf.DEFAULT_ENGINE_CLS, autospec=True)
 
     app.run(**d)
+
+    mock_parse_dict = app_conf.parse_dict
+    pytest.assume(mock_parse_dict.call_count == 1)
+    _, parse_dict_d = mock_parse_dict.call_args
+    implicit_convert_value = parse_dict_d['implicit_convert']
+    pytest.assume(False == implicit_convert_value)
+
 
     mock_from_configuration = mock_cls.from_configuration
     mock_play = mock_from_configuration.return_value.play
