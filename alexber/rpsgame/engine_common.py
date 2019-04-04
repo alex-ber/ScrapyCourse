@@ -9,8 +9,8 @@ if _loggerDict is None or not _loggerDict: #is None or {}
                      'for details')
 del _loggerDict
 
-from alexber.utils import LookUpMixinEnum, Enum
-import enum
+from alexber.utils import LookUpMixinEnum, Enum, enum
+
 
 
 class _OrderedEnum(Enum):
@@ -50,19 +50,12 @@ def _compare(enumeration):
     PAPER = 2
     SCISSORS = 3
 
-    #S<=R
-    #P<=S
-    #R<=P
-    #S<=S
-    #P<=P
-    #R<=R
-
     #we can't reference RockScissorsPaperEnum by name
     #it is not yet defined
     enumeration._le_r = frozenset([
-        (enums[SCISSORS], enums[ROCK]),
-        (enums[PAPER], enums[SCISSORS]),
-        (enums[ROCK], enums[PAPER]),
+        (enums[ROCK], enums[SCISSORS]),
+        (enums[SCISSORS], enums[PAPER]),
+        (enums[PAPER], enums[ROCK]),
 
         (enums[ROCK], enums[ROCK]),
         (enums[PAPER], enums[PAPER]),

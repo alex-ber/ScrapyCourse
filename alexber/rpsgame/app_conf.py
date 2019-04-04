@@ -8,8 +8,7 @@ from collections import OrderedDict
 
 
 CLS_KEY = 'cls'
-NAME_PLAYER_A_KEY='name'
-NAME_PLAYER_B_KEY='name'
+NAME_PLAYER_KEY='name'
 PLAYER_A_KEY='playera'
 PLAYER_B_KEY='playerb'
 DEFAULT_NAME_PLAYER_A = 'Player A'

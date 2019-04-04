@@ -20,15 +20,15 @@ def assert_result(resulta, resultb, exp_res, comparator):
      'resulta, resultb, is_eq, is_noteq, is_less_or_eq,is_less,is_great_or_eq,is_great',
     [
         (RPS.PAPER,RPS.PAPER,        True,False,True,False,      True,False),
-        (RPS.PAPER,RPS.ROCK,         False,True, True,True,     False,False),
-        (RPS.PAPER, RPS.SCISSORS,    False, True,False,False,     True,True),
+        (RPS.PAPER,RPS.ROCK,         False,True, False,False,     True,True),
+        (RPS.PAPER, RPS.SCISSORS,    False, True,True,True,     False,False),
 
-        (RPS.ROCK, RPS.PAPER,        False, True, False, False, True, True),
+        (RPS.ROCK, RPS.PAPER,        False, True, True, True,  False, False),
         (RPS.ROCK, RPS.ROCK,         True, False, True, False,  True, False),
-        (RPS.ROCK, RPS.SCISSORS,     False, True, True, True,  False, False),
+        (RPS.ROCK, RPS.SCISSORS,     False, True, False, False, True, True),
 
-        (RPS.SCISSORS, RPS.PAPER,    False, True, True, True,  False, False),
-        (RPS.SCISSORS, RPS.ROCK,     False, True, False, False,  True, True),
+        (RPS.SCISSORS, RPS.PAPER,    False, True, False, False, True, True),
+        (RPS.SCISSORS, RPS.ROCK,     False, True, True, True, False, False),
         (RPS.SCISSORS, RPS.SCISSORS, True, False, True, False,   True, False),
 
     ]

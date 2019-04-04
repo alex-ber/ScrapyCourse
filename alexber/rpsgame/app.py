@@ -1,11 +1,18 @@
 import logging.config
 
 from alexber.rpsgame import app_conf as conf
-from alexber.rpsgame.app_create_instance import importer
+from alexber.rpsgame.app_create_instance import importer, create_instance
 
 
 
-# TODO: Alex write integration tests
+def _create_player_factory(player_d):
+    assert player_d is not None
+    def factory_player():
+        name_player = player_d.get(conf.NAME_PLAYER_KEY, None)
+        player = create_instance(**player_d)
+        return name_player, player
+
+    return factory_player
 
 
 def run(**kwargs):
@@ -31,11 +38,11 @@ def run(**kwargs):
         engine_str = conf.DEFAULT_ENGINE_CLS
     engine_cls = importer(engine_str)
 
-    playera_d = kwargs.pop(conf.PLAYER_A_KEY, None)
-    playerb_d = kwargs.pop(conf.PLAYER_B_KEY, None)
+    playera_d = kwargs.pop(conf.PLAYER_A_KEY, {})
+    playerb_d = kwargs.pop(conf.PLAYER_B_KEY, {})
 
-    the_engine = engine_cls.from_configuration(playera_d=playera_d,
-                                  playerb_d=playerb_d,
+    the_engine = engine_cls.from_configuration(playera_factory=_create_player_factory(playera_d),
+                                               playerb_factory=_create_player_factory(playerb_d),
                                   **kwargs)
     the_engine.play()
 

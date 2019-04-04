@@ -1,15 +1,18 @@
 
 #TODO: Alex write unit tests
-#TODO: Alex write integration tests
+#
 from random import Random, SystemRandom
 
 MOVES = ['R', 'S', 'P']
 
 
 class ConstantPlayer(object):
+    def __init__(self, move='R'):
+        #no validation is done here by intent
+        self._move = move
 
     def move(self):
-        return 'R'
+        return self._move
 
 class RandomPlayer(object):
 

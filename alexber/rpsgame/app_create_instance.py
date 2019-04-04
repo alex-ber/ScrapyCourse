@@ -72,6 +72,7 @@ def _inject_setters(player, **kwargs):
 
 def create_instance(**kwargs):
     '''This is mini DI Framework.
+    Limitation: you can inject only compile-time constants. You can't inject another callable (class, object, etc).
     Existing DI Frameworks, such as https://pythonhosted.org/injector/ were consider and rejected
     as overcomplicated for defying players
     '''

@@ -117,11 +117,11 @@ def test_parse_ini(request, mocker):
 
     exp_cls_type = type('') #str
     exp_max = 100
-    exp_max_type = int
+    exp_max_type = type(int)
     exp_str = '0'
     exp_str_type = type('') #str
     exp_cost = 0.1
-    exp_cost_type = float
+    exp_cost_type = type(float)
 
     dir = Path(__file__).parent
 

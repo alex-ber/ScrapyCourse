@@ -1,30 +1,27 @@
 import logging
 logger = logging.getLogger(__name__)
-from pathlib import Path
 
 import pytest
 
-from collections import OrderedDict
 import alexber.rpsgame.app as app
 from alexber.rpsgame.app import conf as app_conf
 
-
 _real_parse_config = app_conf.parse_config
 
-_parse_config_return_value = None
 
-def _mock_parse_config(args=None):
-    ret = _real_parse_config(args)
-    global _parse_config_return_value
-    _parse_config_return_value = ret
-    # _parse_config_return_value = ret
-    # globals()['_parse_config_return_value'] = ret
-    #_parse_config_return_value.append(ret)
-    return ret
+
 
 
 def test_main(request, mocker):
     logger.info(f'{request._pyfuncitem.name}()')
+
+    _parse_config_return_value = None
+
+    def _mock_parse_config(args=None):
+        ret = _real_parse_config(args)
+        nonlocal _parse_config_return_value
+        _parse_config_return_value = ret
+        return ret
 
     #mocker.spy(app_conf, 'parse_config')
     mocker.patch.object(app_conf, 'parse_config', side_effect=_mock_parse_config, autospec=True, spec_set=True)
@@ -38,9 +35,6 @@ def test_main(request, mocker):
         .split()
     app.main(argsv)
 
-    #re-import _parse_config_return_value from global
-    global _parse_config_return_value
-
     pytest.assume(app_conf.parse_config.call_count == 1)
     ((playera_cls, playerb_cls),), _ =  app_conf.parse_config.call_args
     pytest.assume( (exp_playera_cls, exp_playerb_cls) == (playera_cls, playerb_cls) )
@@ -52,12 +46,16 @@ def test_main(request, mocker):
 
 
 def test_run(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
     d = {'playera': {'cls': 'alexber.rpsgame.players.ConstantPlayer'},
          'playerb': {'cls': 'alexber.rpsgame.players.ConstantPlayer'},
          }
 
+
     mocker.spy(app_conf, 'parse_dict')
     mock_cls = mocker.patch(app_conf.DEFAULT_ENGINE_CLS, autospec=True, spec_set=True)
+    mock_create_instance = mocker.patch.object(app, 'create_instance', autospec=True, spec_set=True,
+                                               side_effect=[ d['playera'], d['playerb'] ])
 
     app.run(**d)
 
@@ -74,13 +72,62 @@ def test_run(request, mocker):
     pytest.assume(mock_from_configuration.call_count == 1)
     _, engine_d = mock_from_configuration.call_args
 
-    d['playera_d'] = d.pop('playera')
-    d['playerb_d'] = d.pop('playerb')
+    _, engine_d['playera'] = engine_d.pop('playera_factory')()
+    _, engine_d['playerb'] = engine_d.pop('playerb_factory')()
+
     pytest.assume(d == engine_d)
 
     pytest.assume(mock_play.call_count == 1)
     play_args, _ = mock_play.call_args
     pytest.assume(()==play_args )
+
+    pytest.assume(mock_create_instance.call_count == 2)
+    _, param_playera_d = mock_create_instance.call_args_list[0]
+    _, param_playerb_d = mock_create_instance.call_args_list[1]
+
+    pytest.assume(d['playera'], param_playera_d)
+    pytest.assume(d['playerb'], param_playerb_d)
+
+
+def test_create_player_factory_none(request, mocker):
+     logger.info(f'{request._pyfuncitem.name}()')
+
+     with pytest.raises(AssertionError):
+         player = app._create_player_factory(None)
+
+def test_create_player_factory_without_name(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    mocker.patch.object(app, 'create_instance', autospec=True, spec_set=True, return_value=object())
+    d= {}
+
+    factory_fun = app._create_player_factory(d)
+    assert factory_fun is not None
+
+    name_player, player = factory_fun()
+
+    pytest.assume(name_player is None)
+    pytest.assume(player is not None)
+
+
+def test_create_player_factory_with_name(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    mocker.patch.object(app, 'create_instance', autospec=True, spec_set=True, return_value=object())
+
+    exp_name = "John"
+    d = {app_conf.NAME_PLAYER_KEY:exp_name}
+
+    factory_fun = app._create_player_factory(d)
+    assert factory_fun is not None
+
+    name_player, player = factory_fun()
+
+    pytest.assume(exp_name==name_player)
+    pytest.assume(player is not None)
+
+
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
