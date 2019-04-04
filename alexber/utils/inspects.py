@@ -17,13 +17,10 @@ def issetdescriptor(object):
     return hasattr(tp, "__set__")
 
 
-def issetmethod(object):
+def ismethod(object):
     '''
     If object is class, return false.
     If object is not function, return false.
-    Otherwise, return true iff signature of the function has 2 params. (first param is self, second is value to set).
-
-    Limitation: if method has default parameters, they will be still counted.
 
     :param object:
     :return: false if object is not a class and not a function. Otherwise, return true iff signature has 2 params.
@@ -34,7 +31,5 @@ def issetmethod(object):
     if not inspect.isfunction(object):
         return False
 
-    sig = inspect.signature(object)
-    length = len(sig.parameters.keys())
 
-    return length==2    #2=|{self,param}|
+    return True

@@ -1,7 +1,7 @@
 import logging
 import pytest
 import inspect
-from alexber.utils.inspects import issetdescriptor, issetmethod
+from alexber.utils.inspects import issetdescriptor, ismethod
 from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
@@ -46,6 +46,9 @@ class Example(object):
     def baz(self, a, b, c):
         pass
 
+    def seed(self, a=None, version=2):
+        pass
+
 class Base(object):
 
     @property
@@ -66,7 +69,7 @@ class Base(object):
 class Derived(Base):
     def __init__(self, name, address=None, *args, **kwargs):
         pass
-    pass
+
 
 
 @pytest.mark.parametrize(
@@ -77,10 +80,7 @@ class Derived(Base):
 def test_property_get_set(request, obj):
     logger.info(f'{request._pyfuncitem.name}()')
     results = inspect.getmembers(obj, predicate=issetdescriptor)
-    d = OrderedDict()
-
-    for key, value in results:
-        d[key] = value
+    d = {key: value for key, value in results}
 
     prop = d['att1']
 
@@ -91,24 +91,6 @@ def test_property_get_set(request, obj):
     setter = prop.fset
     assert setter is None
 
-@pytest.mark.parametrize(
-     'obj',
-    (Example,
-     Derived),
-)
-def test_method_set(request, obj):
-    logger.info(f'{request._pyfuncitem.name}()')
-    results = inspect.getmembers(obj, predicate=issetmethod)
-    d = OrderedDict()
-
-    for key, value in results:
-        d[key] = value
-
-    setter = d['set_x']
-    setter(self=None, x=100)
-
-    setter = d.get('baz', None)
-    assert setter is None
 
 @pytest.mark.parametrize(
      'f',

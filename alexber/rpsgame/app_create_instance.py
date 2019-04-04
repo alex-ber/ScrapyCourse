@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 import inspect
 from alexber.utils.importer import new_instance, importer
-from alexber.utils.inspects import issetdescriptor, issetmethod
+from alexber.utils.inspects import issetdescriptor, ismethod
 from collections import OrderedDict
 
 from alexber.rpsgame import app_conf as conf
@@ -48,7 +48,7 @@ def _inject_setters(player, **kwargs):
     #__new__() could subsitute __class__, so re-evaluate it
     plcls = type(player)
     # finding @property.fset
-    results = inspect.getmembers(plcls, predicate=issetmethod)
+    results = inspect.getmembers(plcls, predicate=ismethod)
     d = {key: value for key, value in results}
 
     for name, value in kwargs.items():
