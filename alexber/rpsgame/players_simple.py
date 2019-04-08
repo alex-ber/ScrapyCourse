@@ -33,21 +33,37 @@ class CryptoRandomPlayer(RandomPlayer):
 DefaultPlayer = RandomPlayer
 
 
-def main():
-    pass
-    # pl1=RandomPlayer(0)
-    # limit =1000
-    # result1 = [pl1.move() for i in range(limit)]
-    # pl2 = RandomPlayer(0)
-    # result2 = [pl2.move() for i in range(limit)]
-    # assert result1==result2
-    #
-    # pl1=RandomPlayer(10)
-    # limit =1000
-    # result1 = [pl1.move() for i in range(limit)]
-    # pl2 = RandomPlayer(10)
-    # result2 = [pl2.move() for i in range(limit)]
-    # assert result1==result2
+class HumanPlayer(object):
+
+    def move(self):
+        return input("Valid inputs are 'R', 'S', 'P'. Please make you move: ")
+
+
+class HumanValidPlayer(object):
+
+    def __init__(self, num_retry=None):
+        self.num_retry = num_retry
+
+    def _move(self, limit):
+        if limit is None:
+            while True:
+                move = input("Valid inputs are 'R', 'S', 'P'. Please make you move: ")
+                if move in MOVES:
+                    return move
+
+        for _ in range(limit):
+            move = input("Valid inputs are 'R', 'S', 'P'. Please make you move: ")
+            if move in MOVES:
+                return move
+
+        raise ValueError("Too many wrong attempts")
+
+
+
+    def move(self):
+        return self._move(self.num_retry)
+
+
 
 
 if __name__ == '__main__':

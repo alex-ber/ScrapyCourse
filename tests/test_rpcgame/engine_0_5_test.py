@@ -9,6 +9,7 @@ from alexber.rpsgame.players import ConstantPlayer
 from alexber.utils import LookUpMixinEnum, enum
 from alexber.rpsgame.engine import RockScissorsPaperEnum as RPS
 from alexber.rpsgame.app import main as rpsgame_app_main
+from .players_0_5 import HackerPlayer
 
 
 @enum.unique
@@ -228,13 +229,21 @@ def test_play(request, mocker, a_move, b_move, exp_result):
     result = _parse_result(mock_result, a_name, b_name)
     pytest.assume(exp_result == result)
 
-
-def test_play_invalid_move_a(request, mocker):
+@pytest.mark.parametrize(
+    'invalid_move',
+    [
+     ('invalid'),
+     (100),
+	 (0.0),
+	 (1.0),
+     ]
+)
+def test_play_invalid_move_a(request, mocker, invalid_move):
     logger.info(f'{request._pyfuncitem.name}()')
 
     mock_logging = mocker.patch('alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
 
-    player_a = ConstantPlayer("invalid")
+    player_a = ConstantPlayer(invalid_move)
 
     engine = Engine.from_instance(player_a,
                                   None)
@@ -242,8 +251,16 @@ def test_play_invalid_move_a(request, mocker):
     with pytest.raises(ValueError, match='nexpected'):
         engine.play()
 
-
-def test_play_invalid_move_b(request, mocker):
+@pytest.mark.parametrize(
+    'invalid_move',
+    [
+     ('invalid'),
+     (100),
+	 (0.0),
+	 (1.0),
+     ]
+)
+def test_play_invalid_move_b(request, mocker, invalid_move):
     logger.info(f'{request._pyfuncitem.name}()')
 
     mock_logging = mocker.patch('alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
@@ -300,6 +317,34 @@ def test_play_it(request, mocker):
 
     result = _parse_result(mock_result, app_conf.DEFAULT_NAME_PLAYER_A, app_conf.DEFAULT_NAME_PLAYER_B)
     pytest.assume(ResultEnum.DRAW == result)
+
+
+@pytest.mark.it
+
+@pytest.mark.parametrize(
+    'constant_move',
+    [
+        member.value for member in RPS.__members__.values()
+
+     ]
+)
+
+def test_hacker_player(request, mocker, constant_move):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    mock_logging = mocker.patch('alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
+
+    hacker_player_name = '.'.join([HackerPlayer.__module__, HackerPlayer.__name__])
+
+    args = f'--playera.cls={HackerPlayer.__qualname__} --playerb.cls=alexber.rpsgame.players.ConstantPlayer '\
+        f'--playerb.init.move={constant_move}' \
+        .split()
+    rpsgame_app_main(args)
+
+    mock_result = mock_logging.info
+
+    result = _parse_result(mock_result, app_conf.DEFAULT_NAME_PLAYER_A, app_conf.DEFAULT_NAME_PLAYER_B)
+    pytest.assume(ResultEnum.WIN_PLAYER_A == result)
 
 
 

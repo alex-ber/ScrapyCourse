@@ -19,7 +19,7 @@ extras = {
 
 setup(
     name='rocket-paper-scissors-game',
-    version='0.0.1',
+    version='0.5',
     url='https://github.com/alex-ber/RocketPaperScissorsGame',
     author='Alexander Berkovich',
     description='Rock-Paper-Scissors game',
@@ -38,7 +38,7 @@ setup(
     keywords='game engine player rock papaer scissors',
     classifiers=[
         # See: https://pypi.python.org/pypi?:action=list_classifiers
-        'Development Status :: 1 - Planning',
+        'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',

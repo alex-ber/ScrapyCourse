@@ -11,11 +11,11 @@ Limited support for players name.
 0.9 Not Feature complete. Tournament. Engine is not longer singleton. Reports
 are hard-wired at engine.
 
-1.0 Reports at the end. Dependency injection framework? Use of listeners.
+1.0 Reports at the end. Use of listeners.
 
 1.1 Optimization on player's meta-class inheritance.
 
-1.5 You can join the tournament. DI?
+1.5 You can join the tournament.
 
 2.0 Web Service exposure. Use of threadlocal inside engine. API expose immidiate tournament only.
 

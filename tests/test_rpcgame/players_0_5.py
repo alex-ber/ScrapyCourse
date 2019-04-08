@@ -1,9 +1,8 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from alexber.rpsgame import engine
-from alexber.utils import LookUpMixinEnum, Enum, enum
 
+from alexber.utils import LookUpMixinEnum, enum
 
 
 def _compare(enumeration):
@@ -78,6 +77,7 @@ class _HackedEnum(LookUpMixinEnum):
 class HackerPlayer(object):
 
     def __init__(self):
+        from alexber.rpsgame import engine_0_5 as engine
         setattr(engine, 'RockScissorsPaperEnum', _HackedEnum)
         pass
 
@@ -85,7 +85,4 @@ class HackerPlayer(object):
         return 'Z'
 
 
-class ConstantPlayer(object):
 
-    def move(self):
-        return 'R'
