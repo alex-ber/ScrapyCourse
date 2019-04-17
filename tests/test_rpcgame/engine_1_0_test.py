@@ -2,15 +2,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 import pytest
-
-from alexber.rpsgame import engine_0_5
-from alexber.rpsgame.engine_0_5 import Engine
+from alexber.rpsgame import engine_1_0
+from alexber.rpsgame.engine_1_0 import Engine
 from alexber.rpsgame import app_conf
 from alexber.rpsgame.players import ConstantPlayer
 from alexber.utils import LookUpMixinEnum, enum
 from alexber.rpsgame.engine import RockScissorsPaperEnum as RPS
 from alexber.rpsgame.app import main as rpsgame_app_main
-from .players_0_5 import HackerPlayer
 
 
 
@@ -117,17 +115,19 @@ def test_from_instance(request, mocker, name_player_a, name_player_b, is_none_pl
                                   num_iters=1
                                   )
 
-    pytest.assume(exp_name_player_a == engine.name_player_a)
-    pytest.assume(exp_name_player_b == engine.name_player_b)
+    pytest.assume(exp_name_player_a == engine.player_a.name_player)
+    pytest.assume(exp_name_player_b == engine.player_b.name_player)
     if mock_player_a is not None:
-        pytest.assume(mock_player_a == engine.player_a)
+        pytest.assume(mock_player_a.move == engine.player_a.player_move)
+        pass
     else:
         pytest.assume(engine.player_a is not None)
         pytest.assume(not isinstance(engine.player_a, mocker.Mock)) # default player
 
 
     if mock_player_b is not None:
-        pytest.assume(mock_player_b == engine.player_b)
+        pytest.assume(mock_player_b.move == engine.player_b.player_move)
+        pass
     else:
         pytest.assume(engine.player_b is not None)
         pytest.assume(not isinstance(engine.player_b, mocker.Mock)) # default player
@@ -140,6 +140,12 @@ def _parse_event(mock_event):
 
     a_name, a_answer = stra.split("answer's is")
     b_name, b_answer = strb.split("answer's is")
+    a_answer = a_answer.strip()
+    a_answer = a_answer.split(r"'")[1]
+
+    b_answer = b_answer.strip()
+    b_answer = b_answer.split(r"'")[1]
+
     return a_name.strip(), a_answer.strip(), b_name.strip(), b_answer.strip()
 
 def _parse_result(mock_event, a_name, b_name):
@@ -162,7 +168,7 @@ def _parse_result(mock_event, a_name, b_name):
 def test_play_default_names(request, mocker):
     logger.info(f'{request._pyfuncitem.name}()')
 
-    mock_logging = mocker.patch(f'alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
+    mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
 
     player_a = ConstantPlayer()
     player_b = ConstantPlayer()
@@ -181,6 +187,38 @@ def test_play_default_names(request, mocker):
 
     result = _parse_result(mock_result, a_name, b_name)
     pytest.assume(ResultEnum.DRAW == result)
+
+
+class NamedClonstantPlayer(ConstantPlayer):
+    def __init__(self, name, move='R'):
+        super().__init__(move)
+        self.name = name
+
+def test_play_players_names(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
+
+    exp_a_name = 'First Player'
+    exp_b_name = 'Second Player'
+    player_a = NamedClonstantPlayer(exp_a_name)
+    player_b = NamedClonstantPlayer(exp_b_name)
+
+    engine = Engine.from_instance(player_a,
+                                  player_b)
+    engine.play()
+    mock_event =  mock_logging.debug
+    mock_result = mock_logging.info
+
+    a_name, a_answer, b_name, b_answer = _parse_event(mock_event)
+    pytest.assume(exp_a_name == a_name)
+    pytest.assume(player_a._move == a_answer)
+    pytest.assume(exp_b_name == b_name)
+    pytest.assume(player_b._move == b_answer)
+
+    result = _parse_result(mock_result, a_name, b_name)
+    pytest.assume(ResultEnum.DRAW == result)
+
 
 
 #R>S
@@ -206,7 +244,7 @@ def test_play_default_names(request, mocker):
 def test_play(request, mocker, a_move, b_move, exp_result):
     logger.info(f'{request._pyfuncitem.name}()')
 
-    mock_logging = mocker.patch(f'alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
+    mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
 
     exp_name_player_a = 'John A'
     exp_name_player_b = 'John B'
@@ -238,19 +276,18 @@ def test_play(request, mocker, a_move, b_move, exp_result):
      ('invalid'),
      (100),
 	 (0.0),
-     (1.0),
+	 (1.0),
      ]
 )
 def test_play_invalid_move_a(request, mocker, invalid_move):
     logger.info(f'{request._pyfuncitem.name}()')
 
-    mock_logging = mocker.patch(f'alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
+    mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
 
     player_a = ConstantPlayer(invalid_move)
 
     engine = Engine.from_instance(player_a,
                                   None)
-
 
     with pytest.raises(ValueError, match='nexpected'):
         engine.play()
@@ -267,7 +304,7 @@ def test_play_invalid_move_a(request, mocker, invalid_move):
 def test_play_invalid_move_b(request, mocker, invalid_move):
     logger.info(f'{request._pyfuncitem.name}()')
 
-    mock_logging = mocker.patch('alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
+    mock_logging = mocker.patch('alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
 
     player_b = ConstantPlayer("invalid")
 
@@ -281,7 +318,7 @@ def test_play_invalid_move_b(request, mocker, invalid_move):
 def test_play_invalid_move_a_exception(request, mocker):
     logger.info(f'{request._pyfuncitem.name}()')
 
-    mock_logging = mocker.patch(f'alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
+    mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
 
     player_a = ConstantPlayer("invalid")
     player_a.move = lambda: exec('raise(TypeError("Whohaha"))')
@@ -296,7 +333,7 @@ def test_play_invalid_move_a_exception(request, mocker):
 def test_play_invalid_move_b_exception(request, mocker):
     logger.info(f'{request._pyfuncitem.name}()')
 
-    mock_logging = mocker.patch(f'alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
+    mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
 
     player_b = ConstantPlayer("invalid")
     player_b.move = lambda: exec('raise(TypeError("Whohaha"))')
@@ -311,8 +348,8 @@ def test_play_invalid_move_b_exception(request, mocker):
 def test_play_it(request, mocker):
     logger.info(f'{request._pyfuncitem.name}()')
 
-    mocker.patch('alexber.rpsgame.engine', new=engine_0_5)
-    mock_logging = mocker.patch(f'alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
+    mocker.patch('alexber.rpsgame.engine', new=engine_1_0)
+    mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
 
     args = '--playera.cls=alexber.rpsgame.players.ConstantPlayer --playerb.cls=alexber.rpsgame.players.ConstantPlayer'\
         .split()
@@ -322,35 +359,6 @@ def test_play_it(request, mocker):
 
     result = _parse_result(mock_result, app_conf.DEFAULT_NAME_PLAYER_A, app_conf.DEFAULT_NAME_PLAYER_B)
     pytest.assume(ResultEnum.DRAW == result)
-
-
-@pytest.mark.it
-
-@pytest.mark.parametrize(
-    'constant_move',
-    [
-        member.value for member in RPS.__members__.values()
-
-     ]
-)
-
-def test_hacker_player(request, mocker, constant_move):
-    logger.info(f'{request._pyfuncitem.name}()')
-
-    mocker.patch('alexber.rpsgame.engine', new=engine_0_5)
-    mock_logging = mocker.patch(f'alexber.rpsgame.engine_0_5.logging', autospec=True, spec_set=True)
-
-    hacker_player_name = '.'.join([HackerPlayer.__module__, HackerPlayer.__name__])
-
-    args = f'--playera.cls={hacker_player_name} --playerb.cls=alexber.rpsgame.players.ConstantPlayer '\
-        f'--playerb.init.move={constant_move}' \
-        .split()
-    rpsgame_app_main(args)
-
-    mock_result = mock_logging.info
-
-    result = _parse_result(mock_result, app_conf.DEFAULT_NAME_PLAYER_A, app_conf.DEFAULT_NAME_PLAYER_B)
-    pytest.assume(ResultEnum.WIN_PLAYER_A == result)
 
 
 

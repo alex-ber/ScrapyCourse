@@ -8,7 +8,7 @@ from alexber.utils.props import Properties
 
 def test_parse_java_properties_alternative_delim(request, mocker):
     logger.info(f'{request._pyfuncitem.name}()')
-    mocker.patch.object(Properties, 'PLACEHOLDER_TOKEN', new_callable=lambda :'@')
+    mocker.patch.object(Properties, 'PLACEHOLDER_TOKEN', new='@')
     exp_cls_name_a = 'alexber.rpsgame.players.ConstantPlayer'
     exp_cls_name_b = exp_cls_name_a
     expdd = {'playera.cls': 'alexber.rpsgame.players.ConstantPlayer',

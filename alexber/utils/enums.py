@@ -1,7 +1,24 @@
 
-from enum import Enum
+from enum import *
 import logging
 logger = logging.getLogger(__name__)
+import sys
+
+_orig_enum_new = Enum.__new__
+
+#we want to use None to indicate missing Enumm, but
+#https://bugs.python.org/issue34536 prohibts using None in _missing_() @classmethod
+#this fix re-enable it
+def _fixed_new_enum(cls, value):
+    try:
+        return _orig_enum_new(cls, value)
+    except ValueError as e:
+        msg = str(e)
+        if 'is not a valid' in msg:
+            return None
+        raise e
+
+Enum.__new__ = _fixed_new_enum
 
 class StrAsReprMixinEnum(Enum):
     '''
@@ -17,6 +34,7 @@ class AutoNameMixinEnum(Enum):
     '''
     def _generate_next_value_(name, start, count, last_values):
         return name
+
 
 
 class MissingNoneMixinEnum(Enum):
