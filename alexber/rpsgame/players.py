@@ -133,7 +133,7 @@ class CompletedMixin(object, metaclass=ABCMeta):
         ABCMeta.register(cls, _as_type(obj))
 
 
-class RepeadLastMove(object):   #(RoundResultMixin)
+class RepeatLastMove(object):   #(RoundResultMixin)
     def __init__(self, move='R'):
         self._move = move
 

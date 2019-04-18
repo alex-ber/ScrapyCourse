@@ -414,7 +414,7 @@ def test_play_repeat_last_move_it(request, mocker):
     mocker.patch('alexber.rpsgame.engine', new=engine_1_0)
     #mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
 
-    args = '--playera.cls=alexber.rpsgame.players.RepeadLastMove --playerb.cls=alexber.rpsgame.players.ConstantPlayer '\
+    args = '--playera.cls=alexber.rpsgame.players.RepeatLastMove --playerb.cls=alexber.rpsgame.players.ConstantPlayer '\
         "--playera.init.move='R' --playerb.init.move=['R','S','P'] --engine.init.num_iters=4" \
         .split()
     rpsgame_app_main(args)
