@@ -158,7 +158,7 @@ class StartedMixin(EventMaskingMixin):
         kwargs['player'] = player
         super().__init__(**kwargs)
 
-    def started(self, **kwargs):
+    def started(self, kwargs):
         if self.player_started is not None:
             event = self.mask_event(**kwargs)
             self.player_started(**event)
@@ -169,7 +169,7 @@ class RoundResultMixin(EventMaskingMixin):
         kwargs['player'] = player
         super().__init__(**kwargs)
 
-    def round_result(self, **kwargs):
+    def round_result(self, kwargs):
         if self.player_round_result is not None:
             event = self.mask_event(**kwargs)
             self.player_round_result(**event)
@@ -181,7 +181,7 @@ class CompletedMixin(EventMaskingMixin):
         kwargs['player'] = player
         super().__init__(**kwargs)
 
-    def completed(self, **kwargs):
+    def completed(self, kwargs):
         if self.player_completed is not None:
             event = self.mask_event(**kwargs)
             self.player_completed(**event)

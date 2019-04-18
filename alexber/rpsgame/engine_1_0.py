@@ -6,6 +6,8 @@ Limited support for players name.
 import logging
 _loggerDict = logging.root.manager.loggerDict
 
+from pubsub import pub
+
 from alexber.rpsgame.engine_common import RockScissorsPaperEnum, PlayerDecorator
 from alexber.rpsgame import app_conf as conf
 from collections import OrderedDict
@@ -14,7 +16,7 @@ from collections import deque
 from alexber.rpsgame.players import StartedMixin, RoundResultMixin, CompletedMixin
 
 class DefaultListener(StartedMixin, RoundResultMixin, CompletedMixin):
-    def started(self, **kwargs):
+    def started(self, kwargs):
         a_d = kwargs['A']
         b_d = kwargs['B']
         length = kwargs['num_iters']
@@ -23,7 +25,7 @@ class DefaultListener(StartedMixin, RoundResultMixin, CompletedMixin):
         self.player_b_name = b_d['name']
         self.events = deque(maxlen=length)
 
-    def completed(self, **kwargs):
+    def completed(self, kwargs):
         for i, event in enumerate(self.events):
             logging.debug(f"***************** Round {i} ***************")
             self._print_result(**event)
@@ -48,17 +50,30 @@ class DefaultListener(StartedMixin, RoundResultMixin, CompletedMixin):
                 else f"{self.player_b_name} wins, {self.player_a_name} lose"
             logging.info(str)
 
-    def round_result(self, **kwargs):
+    def round_result(self, kwargs):
         self.events.append(kwargs)
 
 
-class Engine(object):
+
+
+class Engine(DefaultListener):
 
     def _init(self, **kwargs):
         self.player_a = kwargs['player_a']
         self.player_b = kwargs['player_b']
 
-        self.listeners = [DefaultListener(), self.player_a, self.player_b]
+        pub.subscribe(self.started, 'started')
+        pub.subscribe(self.player_a.started, 'started')
+        pub.subscribe(self.player_b.started, 'started')
+
+        pub.subscribe(self.completed, 'completed')
+        pub.subscribe(self.player_a.completed, 'completed')
+        pub.subscribe(self.player_b.completed, 'completed')
+
+        pub.subscribe(self.round_result, 'round_result')
+        pub.subscribe(self.player_a.round_result, 'round_result')
+        pub.subscribe(self.player_b.round_result, 'round_result')
+
 
         self.num_iters = kwargs['num_iters']
 
@@ -136,9 +151,7 @@ class Engine(object):
         started_result_b['name'] = self.player_b.name_player
         started_event['num_iters'] = self.num_iters
 
-        #TODO: Alex make ListenerSupport
-        for listener in self.listeners:
-            listener.started(**started_event)
+        pub.sendMessage("started", kwargs=started_event)
 
         for i in range(self.num_iters):
             round_result_event = OrderedDict()
@@ -164,13 +177,12 @@ class Engine(object):
                     round_result_a['result'] = 0
                     round_result_b['result'] = 1
 
-            for listener in self.listeners:
-                listener.round_result(**round_result_event)
+            pub.sendMessage("round_result", kwargs=round_result_event)
 
-        # TODO: Alex make ListenerSupport
+
         completed_event = OrderedDict()
-        for listener in self.listeners:
-            listener.completed(**completed_event)
+        pub.sendMessage("completed", kwargs=completed_event)
+
 
 
 
