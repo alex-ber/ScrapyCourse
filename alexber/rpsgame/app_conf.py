@@ -19,7 +19,7 @@ DEFAULT_PLAYER_CLS = 'alexber.rpsgame.players.DefaultPlayer'
 
 _WHITELIST_FULL_NAMES = {'cls', 'name'}
 _WHITELIST_PREFIX = {'init', 'prop', 'set'}
-_WHITELIST_FLAT_PREFIX = {'playera', 'playerb'}
+_WHITELIST_FLAT_PREFIX = {'engine', 'playera', 'playerb'}
 
 
 

@@ -11,6 +11,7 @@ del _loggerDict
 
 from alexber.utils import LookUpMixinEnum, Enum, enum
 from .players import get_attr, PlayMixin as _PlayMixin, StartedMixin as _StartedMixin, \
+    RoundResultMixin as _RoundResultMixin, \
     CompletedMixin as _CompletedMixin, \
     NamedMixin as _NamedMixin
 
@@ -97,20 +98,21 @@ class PlayMixin(_PlayMixin):
         return resulta
 
 
-def _init_mixin(self, player, mixincls, methodname):
+def _init_mixin(self, player, mixincls, methodname, resolve=True):
     mixincls.register(player)
     b = isinstance(player, mixincls)
     attr_name = f'player_{methodname}'
     if b:
-        attr_value = get_attr(player, methodname)
+        attr_value = get_attr(player, methodname) if resolve else getattr(player, methodname)
     else:
         attr_value = None
 
     setattr(self, attr_name, attr_value)
 
 
+
 class NamedMixin(object):
-    def __init__(self, name_player, default_name, player, **kwargs):
+    def __init__(self, name_player, default_name, technical_name, player, **kwargs):
         _NamedMixin.register(player)
         # consult player_a first
         b = isinstance(player, _NamedMixin)
@@ -121,6 +123,7 @@ class NamedMixin(object):
             name_player = default_name
 
         self.name_player = name_player
+        self.technical_name = technical_name
 
         kwargs['player'] = player
         super().__init__(**kwargs)
@@ -129,29 +132,61 @@ class NamedMixin(object):
     def name(self):
         return self.name_player
 
+class EventMaskingMixin(object):
+    def __init__(self, player, technical_name=None, **kwargs):
+        if not hasattr(self, 'technical_name'):
+            setattr(self, 'technical_name', technical_name)
+        kwargs['player'] = player
+        super().__init__(**kwargs)
 
-class StartedMixin(object):
+    def mask_event(self, **kwargs):
+        event_a_d = kwargs.pop("A")
+        event_b_d = kwargs.pop("B")
+
+        if self.technical_name == 'A':
+            kwargs['ME'] = event_a_d
+            kwargs['OTHER'] = event_b_d
+        else:
+            kwargs['ME'] = event_b_d
+            kwargs['OTHER'] = event_a_d
+
+        return kwargs
+
+class StartedMixin(EventMaskingMixin):
     def __init__(self, player, **kwargs):
-        _init_mixin(self, player, mixincls=_StartedMixin, methodname='started')
+        _init_mixin(self, player, mixincls=_StartedMixin, methodname='started', resolve=False)
         kwargs['player'] = player
         super().__init__(**kwargs)
 
     def started(self, **kwargs):
         if self.player_started is not None:
-            self.player_started()
+            event = self.mask_event(**kwargs)
+            self.player_started(**event)
 
-
-class CompletedMixin(object):
+class RoundResultMixin(EventMaskingMixin):
     def __init__(self, player, **kwargs):
-        _init_mixin(self, player, mixincls=_CompletedMixin, methodname='completed')
+        _init_mixin(self, player, mixincls=_RoundResultMixin, methodname='round_result', resolve=False)
+        kwargs['player'] = player
+        super().__init__(**kwargs)
+
+    def round_result(self, **kwargs):
+        if self.player_round_result is not None:
+            event = self.mask_event(**kwargs)
+            self.player_round_result(**event)
+
+
+class CompletedMixin(EventMaskingMixin):
+    def __init__(self, player, **kwargs):
+        _init_mixin(self, player, mixincls=_CompletedMixin, methodname='completed', resolve=False)
         kwargs['player'] = player
         super().__init__(**kwargs)
 
     def completed(self, **kwargs):
         if self.player_completed is not None:
-            self.player_completed()
+            event = self.mask_event(**kwargs)
+            self.player_completed(**event)
 
-class PlayerDecorator(NamedMixin, StartedMixin, CompletedMixin, PlayMixin):
+class PlayerDecorator(NamedMixin, StartedMixin, RoundResultMixin, CompletedMixin, PlayMixin):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

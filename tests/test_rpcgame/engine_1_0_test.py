@@ -5,7 +5,7 @@ import pytest
 from alexber.rpsgame import engine_1_0
 from alexber.rpsgame.engine_1_0 import Engine
 from alexber.rpsgame import app_conf
-from alexber.rpsgame.players import ConstantPlayer
+from alexber.rpsgame.players import ConstantPlayer, PlayMixin
 from alexber.utils import LookUpMixinEnum, enum
 from alexber.rpsgame.engine import RockScissorsPaperEnum as RPS
 from alexber.rpsgame.app import main as rpsgame_app_main
@@ -134,9 +134,9 @@ def test_from_instance(request, mocker, name_player_a, name_player_b, is_none_pl
 
 
 def _parse_event(mock_event):
-    pytest.assume(mock_event.call_count == 2)
-    (stra,), _ = mock_event.call_args_list[0]
-    (strb,), _ = mock_event.call_args_list[1]
+    pytest.assume(mock_event.call_count == 3)
+    (stra,), _ = mock_event.call_args_list[1]
+    (strb,), _ = mock_event.call_args_list[2]
 
     a_name, a_answer = stra.split("answer's is")
     b_name, b_answer = strb.split("answer's is")
@@ -361,7 +361,69 @@ def test_play_it(request, mocker):
     pytest.assume(ResultEnum.DRAW == result)
 
 
+class ConstantMixingPlayer(PlayMixin):
+    def __init__(self, move='R'):
+        #no validation is done here by intent
+        self._move = move
 
+    def move(self):
+        return self._move
+
+@pytest.mark.it
+def test_play_mixin_it(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    mocker.patch('alexber.rpsgame.engine', new=engine_1_0)
+    mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
+
+    plcls = '.'.join([__name__, ConstantMixingPlayer.__name__])
+
+    args = f'--playera.cls={plcls} --playerb.cls={plcls}'\
+        .split()
+    rpsgame_app_main(args)
+
+    mock_result = mock_logging.info
+
+    result = _parse_result(mock_result, app_conf.DEFAULT_NAME_PLAYER_A, app_conf.DEFAULT_NAME_PLAYER_B)
+    pytest.assume(ResultEnum.DRAW == result)
+
+
+
+@pytest.mark.it
+def test_play2_it(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    mocker.patch('alexber.rpsgame.engine', new=engine_1_0)
+    #mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
+
+    args = '--playera.cls=alexber.rpsgame.players.ConstantPlayer --playerb.cls=alexber.rpsgame.players.ConstantPlayer '\
+        "--playera.init.move=['R'] --playerb.init.move=['R','S','P'] --engine.init.num_iters=4" \
+        .split()
+    rpsgame_app_main(args)
+
+    #TODO: Alex
+    #mock_result = mock_logging.info
+
+    #result = _parse_result(mock_result, app_conf.DEFAULT_NAME_PLAYER_A, app_conf.DEFAULT_NAME_PLAYER_B)
+    #pytest.assume(ResultEnum.DRAW == result)
+
+@pytest.mark.it
+def test_play_repeat_last_move_it(request, mocker):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    mocker.patch('alexber.rpsgame.engine', new=engine_1_0)
+    #mock_logging = mocker.patch(f'alexber.rpsgame.engine_1_0.logging', autospec=True, spec_set=True)
+
+    args = '--playera.cls=alexber.rpsgame.players.RepeadLastMove --playerb.cls=alexber.rpsgame.players.ConstantPlayer '\
+        "--playera.init.move='R' --playerb.init.move=['R','S','P'] --engine.init.num_iters=4" \
+        .split()
+    rpsgame_app_main(args)
+
+    #TODO: Alex
+    #mock_result = mock_logging.info
+
+    #result = _parse_result(mock_result, app_conf.DEFAULT_NAME_PLAYER_A, app_conf.DEFAULT_NAME_PLAYER_B)
+    #pytest.assume(ResultEnum.DRAW == result)
 
 
 if __name__ == "__main__":

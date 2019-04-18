@@ -10,10 +10,46 @@ from alexber.rpsgame.engine_common import RockScissorsPaperEnum, PlayerDecorator
 from alexber.rpsgame import app_conf as conf
 from collections import OrderedDict
 from alexber.rpsgame.app_create_instance import new_instance
+from collections import deque
+from alexber.rpsgame.players import StartedMixin, RoundResultMixin, CompletedMixin
 
+class DefaultListener(StartedMixin, RoundResultMixin, CompletedMixin):
+    def started(self, **kwargs):
+        a_d = kwargs['A']
+        b_d = kwargs['B']
+        length = kwargs['num_iters']
 
+        self.player_a_name = a_d['name']
+        self.player_b_name = b_d['name']
+        self.events = deque(maxlen=length)
 
+    def completed(self, **kwargs):
+        for i, event in enumerate(self.events):
+            logging.debug(f"***************** Round {i} ***************")
+            self._print_result(**event)
 
+    def _print_result(self, **event):
+        round_result_a_d = event["A"]
+        round_result_b_d = event["B"]
+
+        movea = round_result_a_d['move']
+        moveb = round_result_b_d['move']
+        resulta = round_result_a_d['result']
+        resultb = round_result_b_d['result']
+
+        logging.debug(f"{self.player_a_name} answer's is {movea}")
+        logging.debug(f"{self.player_b_name} answer's is {moveb}")
+
+        if resulta == resultb:
+            logging.info("draw!")
+        else:
+            b = resulta > resultb
+            str = f"{self.player_a_name} wins, {self.player_b_name} lose" if b \
+                else f"{self.player_b_name} wins, {self.player_a_name} lose"
+            logging.info(str)
+
+    def round_result(self, **kwargs):
+        self.events.append(kwargs)
 
 
 class Engine(object):
@@ -21,7 +57,10 @@ class Engine(object):
     def _init(self, **kwargs):
         self.player_a = kwargs['player_a']
         self.player_b = kwargs['player_b']
-        kwargs['num_iters']
+
+        self.listeners = [DefaultListener(), self.player_a, self.player_b]
+
+        self.num_iters = kwargs['num_iters']
 
 
     @classmethod
@@ -41,9 +80,11 @@ class Engine(object):
 
         player_a = PlayerDecorator(name_player=name_player_a,
                                    default_name=conf.DEFAULT_NAME_PLAYER_A,
+                                   technical_name = 'A',
                                    player=player_a)
         player_b = PlayerDecorator(name_player=name_player_b,
                                    default_name=conf.DEFAULT_NAME_PLAYER_B,
+                                   technical_name='B',
                                    player=player_b)
 
         engine_d = OrderedDict(kwargs)
@@ -88,23 +129,48 @@ class Engine(object):
         return ret
 
     def play(self):
-        resulta = self.player_a.move()
-        resultb = self.player_b.move()
+        started_event = OrderedDict()
+        started_result_a = started_event.setdefault(self.player_a.technical_name, OrderedDict())
+        started_result_b = started_event.setdefault(self.player_b.technical_name, OrderedDict())
+        started_result_a['name'] = self.player_a.name_player
+        started_result_b['name'] = self.player_b.name_player
+        started_event['num_iters'] = self.num_iters
 
-        self.player_a.started()
-        self.player_b.started()
+        #TODO: Alex make ListenerSupport
+        for listener in self.listeners:
+            listener.started(**started_event)
 
-        logging.debug(f"{self.player_a.name} answer's is {resulta}")
-        logging.debug(f"{self.player_b.name} answer's is {resultb}")
+        for i in range(self.num_iters):
+            round_result_event = OrderedDict()
+            round_result_event['iter'] = i
+            round_result_a = round_result_event.setdefault(self.player_a.technical_name, OrderedDict())
+            round_result_b = round_result_event.setdefault(self.player_b.technical_name, OrderedDict())
 
-        if resulta==resultb:
-            #FUTURE: send as event to players
-            logging.info("draw!")
-        else:
-            b = resulta>resultb
-            str =    f"{self.player_a.name} wins, {self.player_b.name} lose" if b \
-                else f"{self.player_b.name} wins, {self.player_a.name} lose"
-            logging.info(str)
+            resulta = self.player_a.move()
+            resultb = self.player_b.move()
 
-        self.player_a.completed()
-        self.player_b.completed()
+            round_result_a['move'] = resulta
+            round_result_b['move'] = resultb
+
+            if resulta == resultb:
+                round_result_a['result'] = 0
+                round_result_b['result'] = 0
+            else:
+                b = resulta > resultb
+                if b:
+                    round_result_a['result'] = 1
+                    round_result_b['result'] = 0
+                else:
+                    round_result_a['result'] = 0
+                    round_result_b['result'] = 1
+
+            for listener in self.listeners:
+                listener.round_result(**round_result_event)
+
+        # TODO: Alex make ListenerSupport
+        completed_event = OrderedDict()
+        for listener in self.listeners:
+            listener.completed(**completed_event)
+
+
+

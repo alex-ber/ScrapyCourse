@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 import pytest
 import datetime
 
-
+from collections.abc import Iterable
 from alexber.rpsgame.players import ConstantPlayer, RandomPlayer, CryptoRandomPlayer, HumanPlayer, HumanValidPlayer
 from alexber.rpsgame.engine import RockScissorsPaperEnum as RPS
 from alexber.utils import LookUpMixinEnum, enum
@@ -19,6 +19,7 @@ def test_constant_player(request):
 
     assert exp_move==move
 
+#TODO: Alex more ConstantPlayer unit-tests
 
 
 def get_epochtime_ms():

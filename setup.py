@@ -38,7 +38,7 @@ setup(
     keywords='game engine player rock papaer scissors',
     classifiers=[
         # See: https://pypi.python.org/pypi?:action=list_classifiers
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
@@ -50,6 +50,7 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.7.2',
         'Programming Language :: Python :: Implementation :: CPython'
         "Topic :: Utilities",
         'Topic :: Software Development :: Libraries :: Python Modules',
@@ -63,7 +64,7 @@ setup(
         'Operating System :: Unix',
         'Natural Language :: English',
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.7.2',
     zip_safe= False,
     include_package_data=True
 )

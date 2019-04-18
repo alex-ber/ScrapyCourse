@@ -2,7 +2,7 @@ import logging.config
 
 from alexber.rpsgame import app_conf as conf
 from alexber.rpsgame.app_create_instance import importer, create_instance
-
+from collections import OrderedDict
 
 
 def _create_player_factory(player_d):
@@ -13,6 +13,18 @@ def _create_player_factory(player_d):
         return name_player, player
 
     return factory_player
+
+def _mask_engine_params(engine_d):
+    d = OrderedDict()
+
+    for name, value in engine_d.items():
+        if not name.startswith("init."):
+            logger.debug(f"Skipping {name}, doesn't have prefix 'init'")
+            continue
+
+        real_name = name[len("init."):]
+        d[real_name] = value
+    return d
 
 
 def run(**kwargs):
@@ -33,10 +45,14 @@ def run(**kwargs):
     #if you want to convert values do it explictely
     kwargs = conf.parse_dict(kwargs, implicit_convert=False)
 
-    engine_str = kwargs.pop(conf.ENGINE_KEY, None)
+    engine_d = kwargs.pop(conf.ENGINE_KEY, {})
+    engine_str = engine_d.pop(conf.CLS_KEY, None)
+
     if engine_str is None:
         engine_str = conf.DEFAULT_ENGINE_CLS
     engine_cls = importer(engine_str)
+    p_engine_d = _mask_engine_params(engine_d)
+    kwargs.update(p_engine_d)
 
     playera_d = kwargs.pop(conf.PLAYER_A_KEY, {})
     playerb_d = kwargs.pop(conf.PLAYER_B_KEY, {})

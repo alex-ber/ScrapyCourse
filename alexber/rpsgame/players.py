@@ -96,6 +96,24 @@ class StartedMixin(object, metaclass=ABCMeta):
     def register(cls, obj):
         ABCMeta.register(cls, _as_type(obj))
 
+class RoundResultMixin(object, metaclass=ABCMeta):
+
+    @abstractmethod
+    def round_result(self, **kwargs):
+        raise NotImplementedError("Please, use get_attr() function.")
+
+    @classmethod
+    def __subclasshook__(cls, C):
+        if cls is RoundResultMixin:
+            ret = _issublass(C, 'round_result')
+            return ret
+        return NotImplemented
+
+    @classmethod
+    def register(cls, obj):
+        ABCMeta.register(cls, _as_type(obj))
+
+
 
 class CompletedMixin(object, metaclass=ABCMeta):
 
@@ -113,3 +131,16 @@ class CompletedMixin(object, metaclass=ABCMeta):
     @classmethod
     def register(cls, obj):
         ABCMeta.register(cls, _as_type(obj))
+
+
+class RepeadLastMove(RoundResultMixin):
+    def __init__(self, move='R'):
+        self._move = move
+
+    def move(self):
+        return self._move
+
+    def round_result(self, **kwargs):
+        self._move = kwargs["OTHER"]['move']
+
+

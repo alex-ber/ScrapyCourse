@@ -1,18 +1,43 @@
 
-#TODO: Alex write unit tests
-#
 from random import Random, SystemRandom
 
 MOVES = ['R', 'S', 'P']
+import itertools
+
+def _is_iterable(item):
+    try:
+        iter(item)
+        return True
+    except TypeError:
+        return False
 
 
+
+# class ConstantPlayer(object):
+#     def __init__(self, move='R'):
+#         #no validation is done here by intent
+#         self._move = move
+#
+#     def move(self):
+#         return self._move
+#
 class ConstantPlayer(object):
-    def __init__(self, move='R'):
+    def __init__(self, move=['R']):
         #no validation is done here by intent
-        self._move = move
+        #str is iterable, but we want to treat it as scalar
+        if isinstance(move, str) or not _is_iterable(move):
+            iterable = [move]
+        else:
+            iterable = move
+
+        self._moves = itertools.cycle(iterable)
 
     def move(self):
-        return self._move
+        # return self._move
+        ret = next(self._moves)
+        #for backward-compatibility
+        self._move = ret
+        return ret
 
 class RandomPlayer(object):
 
@@ -66,5 +91,3 @@ class HumanValidPlayer(object):
 
 
 
-if __name__ == '__main__':
-    main()
