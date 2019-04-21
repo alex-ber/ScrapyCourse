@@ -21,11 +21,13 @@ class Engine(object):
         self.player_a = kwargs['player_a']
         self.player_b = kwargs['player_b']
         kwargs['num_iters']
+        kwargs['id']
 
     @classmethod
     def from_instance(cls, player_a=None, player_b=None,
                      name_player_a=conf.DEFAULT_NAME_PLAYER_A,  name_player_b=conf.DEFAULT_NAME_PLAYER_B,
                       num_iters=1,
+                      id=None,
                       **kwargs):
         if player_a is None and player_b is None:
             raise ValueError("Both player's can't be None")
@@ -49,6 +51,7 @@ class Engine(object):
         engine_d['name_player_a'] = name_player_a
         engine_d['name_player_b'] = name_player_b
         engine_d['num_iters'] = num_iters
+        engine_d['id'] = id
         self = object.__new__(cls)
         cls.__init__(self, **engine_d)
         return self
@@ -57,6 +60,7 @@ class Engine(object):
     def from_configuration(cls,
                      playera_factory, playerb_factory,
                       num_iters=1,
+                      id=None,
                      **kwargs):
         """
         NOTE: that factory for player's instantiation are DI agnostic.
@@ -83,6 +87,7 @@ class Engine(object):
                                 name_player_a=name_player_a,
                                 name_player_b=name_player_b,
                                 num_iters=num_iters,
+                                id=id,
                                 **kwargs
                                )
         return ret

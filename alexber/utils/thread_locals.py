@@ -18,3 +18,9 @@ def get_threadlocal_var(varname):
     if v is None:
         raise ValueError(f"threadlocal's {varname} is not initilized")
     return v
+
+def del_threadlocal_var(varname):
+    try:
+        delattr(thread_locals, varname)
+    except AttributeError:
+        pass

@@ -2,7 +2,7 @@
 from enum import *
 import logging
 logger = logging.getLogger(__name__)
-import sys
+
 
 _orig_enum_new = Enum.__new__
 

@@ -6,17 +6,52 @@ Limited support for players name.
 import logging
 _loggerDict = logging.root.manager.loggerDict
 
-from pubsub import pub
 
 from alexber.rpsgame.engine_common import RockScissorsPaperEnum, PlayerDecorator
 from alexber.rpsgame import app_conf as conf
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from alexber.rpsgame.app_create_instance import new_instance
 from collections import deque
 from alexber.rpsgame.players import StartedMixin, RoundResultMixin, CompletedMixin
 
+from alexber.utils import threadlocal_var, get_threadlocal_var, del_threadlocal_var, uuid1mc
+
+
+def reset_event_listeners():
+    del_threadlocal_var("all_listeners")
+
+#API inspired by Pypubsub==4.0.3
+class EventListenerSupport(object):
+    def __init__(self, factory, *args, **kwargs):
+        threadlocal_var("all_listeners", factory, *args, **kwargs)
+
+
+    def subscribe(self, listener, topicName, **curriedArgs):
+        #pub.subscribe(listener, topicName)
+
+        if curriedArgs is not None and curriedArgs:
+            raise ValueError("curriedArgs is not supported")
+
+        all_listeners = get_threadlocal_var("all_listeners")
+        listeners = all_listeners[topicName]
+        listeners.append(listener)
+
+    def sendMessage(self, topicName, **kwargs):
+        #pub.sendMessage(topicName, kwargs)
+
+        all_listeners = get_threadlocal_var("all_listeners")
+        listeners = all_listeners[topicName]
+
+        for listener in listeners:
+            listener(**kwargs)
+
+
+
+
+
+
 class DefaultListener(StartedMixin, RoundResultMixin, CompletedMixin):
-    def started(self, kwargs):
+    def started(self, **kwargs):
         a_d = kwargs['A']
         b_d = kwargs['B']
         length = kwargs['num_iters']
@@ -25,7 +60,7 @@ class DefaultListener(StartedMixin, RoundResultMixin, CompletedMixin):
         self.player_b_name = b_d['name']
         self.events = deque(maxlen=length)
 
-    def completed(self, kwargs):
+    def completed(self, **kwargs):
         for i, event in enumerate(self.events):
             logging.debug(f"***************** Round {i} ***************")
             self._print_result(**event)
@@ -50,38 +85,43 @@ class DefaultListener(StartedMixin, RoundResultMixin, CompletedMixin):
                 else f"{self.player_b_name} wins, {self.player_a_name} lose"
             logging.info(str)
 
-    def round_result(self, kwargs):
+    def round_result(self, **kwargs):
         self.events.append(kwargs)
 
 
 
 
-class Engine(DefaultListener):
+class Engine(EventListenerSupport, DefaultListener):
 
     def _init(self, **kwargs):
+        self.num_iters = kwargs['num_iters']
+        self.id = kwargs['id']
+
         self.player_a = kwargs['player_a']
         self.player_b = kwargs['player_b']
 
-        pub.subscribe(self.started, 'started')
-        pub.subscribe(self.player_a.started, 'started')
-        pub.subscribe(self.player_b.started, 'started')
+        EventListenerSupport.__init__(self, defaultdict, list)
 
-        pub.subscribe(self.completed, 'completed')
-        pub.subscribe(self.player_a.completed, 'completed')
-        pub.subscribe(self.player_b.completed, 'completed')
+        self.subscribe(self.started, f'{self.id}.started')
+        self.subscribe(self.player_a.started, f'{self.id}.started')
+        self.subscribe(self.player_b.started, f'{self.id}.started')
 
-        pub.subscribe(self.round_result, 'round_result')
-        pub.subscribe(self.player_a.round_result, 'round_result')
-        pub.subscribe(self.player_b.round_result, 'round_result')
+        self.subscribe(self.completed, f'{self.id}.completed')
+        self.subscribe(self.player_a.completed, f'{self.id}.completed')
+        self.subscribe(self.player_b.completed, f'{self.id}.completed')
+
+        self.subscribe(self.round_result, f'{self.id}.round_result')
+        self.subscribe(self.player_a.round_result, f'{self.id}.round_result')
+        self.subscribe(self.player_b.round_result, f'{self.id}.round_result')
 
 
-        self.num_iters = kwargs['num_iters']
 
 
     @classmethod
     def from_instance(cls, player_a=None, player_b=None,
                      name_player_a=None,  name_player_b=None,
                       num_iters=1,
+                      id=None,
                       **kwargs):
         if player_a is None and player_b is None:
             raise ValueError("Both player's can't be None")
@@ -92,6 +132,8 @@ class Engine(DefaultListener):
         if player_b is None:
             player_b = new_instance(conf.DEFAULT_PLAYER_CLS)
 
+        if id is None:
+            id = str(uuid1mc())
 
         player_a = PlayerDecorator(name_player=name_player_a,
                                    default_name=conf.DEFAULT_NAME_PLAYER_A,
@@ -106,6 +148,7 @@ class Engine(DefaultListener):
         engine_d['player_a'] = player_a
         engine_d['player_b'] = player_b
         engine_d['num_iters'] = num_iters
+        engine_d['id'] = id
         self = object.__new__(cls)
         cls._init(self, **engine_d)
         return self
@@ -113,7 +156,8 @@ class Engine(DefaultListener):
     @classmethod
     def from_configuration(cls,
                      playera_factory, playerb_factory,
-                      num_iters=1,
+                     num_iters=1,
+                     id=None,
                      **kwargs):
         """
         NOTE: that factory for player's instantiation are DI agnostic.
@@ -139,6 +183,7 @@ class Engine(DefaultListener):
                                 name_player_a=name_player_a,
                                 name_player_b=name_player_b,
                                 num_iters=num_iters,
+                                id=id,
                                 **kwargs
                                )
         return ret
@@ -151,7 +196,7 @@ class Engine(DefaultListener):
         started_result_b['name'] = self.player_b.name_player
         started_event['num_iters'] = self.num_iters
 
-        pub.sendMessage("started", kwargs=started_event)
+        self.sendMessage(f"{self.id}.started", **started_event)
 
         for i in range(self.num_iters):
             round_result_event = OrderedDict()
@@ -177,12 +222,11 @@ class Engine(DefaultListener):
                     round_result_a['result'] = 0
                     round_result_b['result'] = 1
 
-            pub.sendMessage("round_result", kwargs=round_result_event)
+            self.sendMessage(f"{self.id}.round_result", **round_result_event)
 
 
         completed_event = OrderedDict()
-        pub.sendMessage("completed", kwargs=completed_event)
-
+        self.sendMessage(f"{self.id}.completed", **completed_event)
 
 
 

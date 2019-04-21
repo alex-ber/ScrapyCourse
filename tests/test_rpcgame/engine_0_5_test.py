@@ -345,6 +345,7 @@ def test_hacker_player(request, mocker, constant_move):
     args = f'--playera.cls={hacker_player_name} --playerb.cls=alexber.rpsgame.players.ConstantPlayer '\
         f'--playerb.init.move={constant_move}' \
         .split()
+
     rpsgame_app_main(args)
 
     mock_result = mock_logging.info

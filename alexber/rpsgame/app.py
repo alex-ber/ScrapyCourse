@@ -3,7 +3,7 @@ import logging.config
 from alexber.rpsgame import app_conf as conf
 from alexber.rpsgame.app_create_instance import importer, create_instance
 from collections import OrderedDict
-
+from alexber.utils import uuid1mc
 
 def _create_player_factory(player_d):
     assert player_d is not None
@@ -52,6 +52,7 @@ def run(**kwargs):
         engine_str = conf.DEFAULT_ENGINE_CLS
     engine_cls = importer(engine_str)
     p_engine_d = _mask_engine_params(engine_d)
+
     kwargs.update(p_engine_d)
 
     playera_d = kwargs.pop(conf.PLAYER_A_KEY, {})

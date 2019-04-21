@@ -6,7 +6,7 @@ from collections import OrderedDict
 logger = logging.getLogger(__name__)
 
 from uuid import uuid1
-_int_from_bytes = int.from_bytes  # py3 only
+_int_from_bytes = int.from_bytes
 from os import urandom
 from alexber.utils import uuid1mc
 

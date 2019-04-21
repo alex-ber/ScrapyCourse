@@ -56,7 +56,6 @@ def test_run(request, mocker):
     mock_cls = mocker.patch(app_conf.DEFAULT_ENGINE_CLS, autospec=True, spec_set=True)
     mock_create_instance = mocker.patch.object(app, 'create_instance', autospec=True, spec_set=True,
                                                side_effect=[ d['playera'], d['playerb'] ])
-
     app.run(**d)
 
     mock_parse_dict = app_conf.parse_dict
