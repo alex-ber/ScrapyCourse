@@ -15,9 +15,13 @@ are hard-wired at engine.
 
 TODO
 Players
- (Web Service version of the Player)
+
+(Web Service version of the Player)
+
 ConstantPlayer - Test
+
 test_play2_it TODO
+
 test_play_repeat_last_move_it TODO
 
 
