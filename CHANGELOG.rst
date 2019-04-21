@@ -24,6 +24,9 @@ test_play2_it TODO
 
 test_play_repeat_last_move_it TODO
 
+threadlocal_var  TODO
+
+ConstantPlayer  TODO
 
 1.1 Optimization on player's meta-class inheritance.
 
