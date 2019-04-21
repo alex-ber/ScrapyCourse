@@ -16,14 +16,17 @@ from alexber.rpsgame.players import StartedMixin, RoundResultMixin, CompletedMix
 
 from alexber.utils import threadlocal_var, get_threadlocal_var, del_threadlocal_var, uuid1mc
 
+import threading
+thread_locals = threading.local()
+
 
 def reset_event_listeners():
-    del_threadlocal_var("all_listeners")
+    del_threadlocal_var(thread_locals, "all_listeners")
 
 #API inspired by Pypubsub==4.0.3
 class EventListenerSupport(object):
     def __init__(self, factory, *args, **kwargs):
-        threadlocal_var("all_listeners", factory, *args, **kwargs)
+        threadlocal_var(thread_locals, "all_listeners", factory, *args, **kwargs)
 
 
     def subscribe(self, listener, topicName, **curriedArgs):
@@ -32,14 +35,14 @@ class EventListenerSupport(object):
         if curriedArgs is not None and curriedArgs:
             raise ValueError("curriedArgs is not supported")
 
-        all_listeners = get_threadlocal_var("all_listeners")
+        all_listeners = get_threadlocal_var(thread_locals, "all_listeners")
         listeners = all_listeners[topicName]
         listeners.append(listener)
 
     def sendMessage(self, topicName, **kwargs):
         #pub.sendMessage(topicName, kwargs)
 
-        all_listeners = get_threadlocal_var("all_listeners")
+        all_listeners = get_threadlocal_var(thread_locals, "all_listeners")
         listeners = all_listeners[topicName]
 
         for listener in listeners:

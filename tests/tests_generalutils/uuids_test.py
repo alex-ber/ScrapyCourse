@@ -1,7 +1,5 @@
 import logging
 import pytest
-import inspect
-from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 
