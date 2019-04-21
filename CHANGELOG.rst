@@ -13,6 +13,14 @@ are hard-wired at engine.
 
 1.0 Reports at the end. Use of listeners.
 
+TODO
+Players
+ (Web Service version of the Player)
+ConstantPlayer - Test
+test_play2_it TODO
+test_play_repeat_last_move_it TODO
+
+
 1.1 Optimization on player's meta-class inheritance.
 
 1.5 You can join the tournament.
