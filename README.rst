@@ -15,10 +15,3 @@ python setup.py test #run all tests
 pytest
 
 
-Scrapy
-=======
-
-scrapy shell
-
-: fetch("http://quotes.toscrape.com/")
-: response.xpath('//h1/a/text()').extract()  #extract_first()
