@@ -4,8 +4,30 @@ Scrapy
 scrapy shell
 
 : fetch("http://quotes.toscrape.com/")
-
 : response.xpath('//h1/a/text()').extract()  #extract_first()
+: response.xpath('//*[@class="tag"]') # find all tags with attribute class="tag-item"
+: response.xpath('//*[@class="tag-item"/a/text()]') # find all tags with attribute class="tag-item"
 
-: response.xpath('//*[@class="tag"]') # find all tags with attribute class="tag"
+cmd
+
+> scrapy crawl quotes
+
+quotes_spider\settings.py
+ROBOTSTXT_OBEY
+
+
+scrapy shell
+
+: from scrapy.selector import Selector
+: sel = Selector(text=html_doc)
+: sel.xpath('html/head/title') #return Selector #extract() text
+#select all title nodes
+: sel.xpath('//p').extract()
+: sel.xpath('//p[1]/text()').extract()
+: sel.xpath('//p/text()')[0].extract()
+: sel.xpath('//h2/a/@href').extract()
+
+
+XPath tutorial
+https://www.freeformatter.com/xpath-tester.html
 
