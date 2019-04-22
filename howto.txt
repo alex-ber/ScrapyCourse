@@ -1,0 +1,11 @@
+Scrapy
+=======
+
+scrapy shell
+
+: fetch("http://quotes.toscrape.com/")
+
+: response.xpath('//h1/a/text()').extract()  #extract_first()
+
+: response.xpath('//*[@class="tag"]') # find all tags with attribute class="tag"
+
