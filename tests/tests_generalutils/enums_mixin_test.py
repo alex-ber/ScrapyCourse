@@ -2,11 +2,50 @@
 import logging
 import pytest
 import enum
-from alexber.utils.enums import _orig_enum_new
 from alexber.utils.enums import Enum, auto
 from alexber.utils import StrAsReprMixinEnum, LookUpMixinEnum, AutoNameMixinEnum, MissingNoneMixinEnum
 
 # #use standard Enum.__new__
+def _orig_enum_new(cls, value):
+    # all enum instances are actually created during class construction
+    # without calling this method; this method is called by the metaclass'
+    # __call__ (i.e. Color(3) ), and by pickle
+    if type(value) is cls:
+        # For lookups like Color(Color.RED)
+        return value
+    # by-value search for a matching enum member
+    # see if it's in the reverse mapping (for hashable values)
+    try:
+        if value in cls._value2member_map_:
+            return cls._value2member_map_[value]
+    except TypeError:
+        # not there, now do long search -- O(n) behavior
+        for member in cls._member_map_.values():
+            if member._value_ == value:
+                return member
+    # still not found -- try _missing_ hook
+    try:
+        exc = None
+        result = cls._missing_(value)
+    except Exception as e:
+        exc = e
+        result = None
+
+    if isinstance(result, cls):
+        return result
+    else:
+        ve_exc = ValueError("%r is not a valid %s" % (value, cls.__name__))
+        if result is None and exc is None:
+            raise ve_exc
+        elif exc is None:
+            exc = TypeError(
+                'error in %s._missing_: returned %r instead of None or a valid member'
+                % (cls.__name__, result)
+            )
+        exc.__context__ = ve_exc
+        raise exc
+
+
 Enum.__new__ = _orig_enum_new
 StrAsReprMixinEnum.__new__ = _orig_enum_new
 LookUpMixinEnum.__new__ = _orig_enum_new
