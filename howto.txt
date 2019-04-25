@@ -1,22 +1,25 @@
 Scrapy
 =======
 
-scrapy shell
+scrapy3 shell "http://quotes.toscrape.com/"
+
+scrapy3 shell
 
 : fetch("http://quotes.toscrape.com/")
 : response.xpath('//h1/a/text()').extract()  #extract_first()
 : response.xpath('//*[@class="tag"]') # find all tags with attribute class="tag-item"
 : response.xpath('//*[@class="tag-item"/a/text()]') # find all tags with attribute class="tag-item"
 
+
 cmd
 
-> scrapy crawl quotes
+> scrapy3 crawl quotes
 
-quotes_spider\settings.py
+alexber\quotes_spider\settings.py
 ROBOTSTXT_OBEY
 
 
-scrapy shell
+scrapy3 shell
 
 : from scrapy.selector import Selector
 : sel = Selector(text=html_doc)
@@ -31,3 +34,14 @@ scrapy shell
 XPath tutorial
 https://www.freeformatter.com/xpath-tester.html
 
+
+
+scrapy3 shell "http://quotes.toscrape.com/"
+
+: quotes = response.xpath('//*[@class="quote"]')
+: quotes[0].xpath('.//a') #dot ensure that search is relative
+
+absoulte_next_page_url = response.urljoin(next_page_url) #from relative to absolute URL
+yield scrapy.Request(absoulte_next_page_url)      #new request, callback=pars
+
+scrapy3 crawl quotes -o items.csv

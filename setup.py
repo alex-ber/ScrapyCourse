@@ -33,7 +33,7 @@ setup(
     test_suite="tests",
     tests_require=tests_require,
     setup_requires=['pytest-runner'],
-    #namespace_packages=('alexber',),
+    namespace_packages=('alexber',),
     license='Apache 2.0',
     keywords='scrapy',
     classifiers=[
