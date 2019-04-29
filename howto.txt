@@ -1,3 +1,5 @@
+https://github.com/aivarsk/scrapy-proxies or ScrapingHub.com
+
 Scrapy
 =======
 
@@ -45,3 +47,7 @@ absoulte_next_page_url = response.urljoin(next_page_url) #from relative to absol
 yield scrapy.Request(absoulte_next_page_url)      #new request, callback=pars
 
 scrapy3 crawl quotes -o items.csv
+scrapy3 crawl quotes -o items.csv -s DOWNLOAD_DELAY=5
+
+#pip3 install shub==2.8.2 #CLI to depploy to Scrapinghub
+shub deploy
