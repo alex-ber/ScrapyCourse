@@ -15,6 +15,9 @@ scrapy3 shell
 
 cmd
 
+> scrapy3 startproject quotes_spider
+> cd quotes_spider
+> scrapy3 genspider quotes quotes.toscrape.com
 > scrapy3 crawl quotes
 
 alexber\quotes_spider\settings.py
@@ -51,3 +54,16 @@ scrapy3 crawl quotes -o items.csv -s DOWNLOAD_DELAY=5
 
 #pip3 install shub==2.8.2 #CLI to depploy to Scrapinghub
 shub deploy
+
+
+from scrapy.http import FormRequest#, Request
+csrf_token = response.xpath('//*[@name="csrf_token"]/@value').extract_first()
+
+yield FormRequest(url, formdata={'csrf_token':csrf_token, 'username': username},
+        callback=self.parse_after_login)
+
+from scrapy.utils.response import open_in_browser
+open_in_browser(response)
+
+from scrapy.spiders import CrawlSpider, Rule
+
