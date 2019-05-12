@@ -64,7 +64,7 @@ setup(
         'Operating System :: Unix',
         'Natural Language :: English',
     ],
-    python_requires='>=3.7.2',
+    python_requires='>=3.7.1',
     zip_safe= False,
     include_package_data=True
 )
