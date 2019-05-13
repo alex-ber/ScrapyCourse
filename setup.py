@@ -11,10 +11,10 @@ def get_content(filename):
 
 install_requires = get_content('requirements.txt')
 tests_require = get_content('requirements-tests.txt')
-extras = {
-    'ws': get_content('requirements-ws.txt'),
-    'test': tests_require
-}
+# extras = {
+#     'ws': get_content('requirements-ws.txt'),
+#     'test': tests_require
+# }
 
 
 setup(
@@ -29,7 +29,7 @@ setup(
     ]),
     packages=setuptools.find_packages(exclude=('tests*',)),
     install_requires=install_requires,
-    extras_require=extras,
+    #extras_require=extras,
     test_suite="tests",
     tests_require=tests_require,
     setup_requires=['pytest-runner'],
