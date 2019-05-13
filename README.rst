@@ -11,17 +11,24 @@ TODO
 
 QuickStart
 ==========
-pip install . # only installs "required"
+#wget https://github.com/alex-ber/RocketPaperScissorsGame/archive/master.zip -O master.zip; unzip master.zip; rm -f master.zip
 
-pip install .[ws]   # installs web-service dependencies
+pip3 install https://github.com/alex-ber/RocketPaperScissorsGame/archive/master.zip#egg=rocket-paper-scissors-game[tests]
 
-pip install .[test] # installs dependencies for tests
+====
+
+
+python3 -m pip install . # only installs "required"
+
+python3 -m pip install .[ws]   # installs web-service dependencies
+
+python3 -m pip install .[test] # installs dependencies for tests
 
 ====
 
 From the directory with setup.py
 
-python setup.py test #run all tests
+python3 setup.py test #run all tests
 
 pytest
 
