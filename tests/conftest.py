@@ -1,5 +1,11 @@
 import pytest
 
+#one-time setup
+import os
+cwd = os.getcwd()
+if cwd.endswith('RocketPaperScissorsGame'):
+    os.chdir(os.path.join(cwd, 'data'))
+
 iswebfound = False
 try:
     from web import application

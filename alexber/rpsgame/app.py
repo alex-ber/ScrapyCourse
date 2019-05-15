@@ -1,9 +1,9 @@
 import logging.config
+from collections import OrderedDict
 
 from alexber.rpsgame import app_conf as conf
 from alexber.rpsgame.app_create_instance import importer, create_instance
-from collections import OrderedDict
-from alexber.utils import uuid1mc
+
 
 def _create_player_factory(player_d):
     assert player_d is not None
