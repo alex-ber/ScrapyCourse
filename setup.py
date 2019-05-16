@@ -23,7 +23,7 @@ try:
     os.symlink(os.path.join('..', '..', 'data'), lnk_data)
     setup(
         name='rocket-paper-scissors-game',
-        version='0.5.1',
+        version='0.5.2',
         url='https://github.com/alex-ber/RocketPaperScissorsGame',
         author='Alexander Berkovich',
         description='Rock-Paper-Scissors game',

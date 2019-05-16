@@ -1,7 +1,7 @@
 import logging
 import pytest
 
-from alexber.utils.parsers import ConfigParser, ArgumentParser, safe_eval
+from alexber.utils.parsers import ConfigParser, ArgumentParser, safe_eval, parse_boolean
 
 logger = logging.getLogger(__name__)
 from pathlib import Path
@@ -98,6 +98,59 @@ def test_convert(request, value, exp_value, exp_type):
     type_result = type(result)
     pytest.assume(exp_value == result)
     pytest.assume(exp_type == type_result)
+
+
+@pytest.mark.parametrize(
+    'value, exp_result',
+    [
+     (True, True),
+     (False, False),
+     (None, None),
+
+     ("True", True),
+     ("False", False),
+
+     ("True", True),
+     ("False", False),
+
+     ("true", True),
+     ("false", False),
+
+     (1, True),
+     (0, False),
+
+     ("TRUE", True),
+     ("FALSE", False),
+     ]
+)
+def test_parse_boolean(request, value, exp_result):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    result = parse_boolean(value)
+    assert exp_result == result
+
+@pytest.mark.parametrize(
+    'value',
+    [
+     ("gibrish123"),
+     ("T"),
+     ("F"),
+
+     ("t"),
+     ("f"),
+
+     ("1"),
+     ("0"),
+     ]
+)
+
+
+def test_parse_boolean_invalid(request, value):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    with pytest.raises(ValueError, match='nknown'):
+        parse_boolean(value)
+
 
 
 if __name__ == "__main__":

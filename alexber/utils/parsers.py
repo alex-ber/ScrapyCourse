@@ -88,3 +88,15 @@ def safe_eval(value):
         ret = value
     return ret
 
+
+def parse_boolean(value):
+    if value is None:
+        return None
+
+    if value in (True, False):
+        return value
+    try:
+        return {"true": True, "false": False}[value.casefold()]
+    except KeyError:
+        raise ValueError("unknown string for bool: %r" % value)
+
