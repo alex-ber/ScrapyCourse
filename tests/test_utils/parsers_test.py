@@ -110,8 +110,11 @@ def test_convert(request, value, exp_value, exp_type):
      ("True", True),
      ("False", False),
 
-     ("True", True),
-     ("False", False),
+     ("TRUE", True),
+     ("FALSE", False),
+
+     ("tRuE", True),
+     ("fALsE", False),
 
      ("true", True),
      ("false", False),
@@ -119,8 +122,6 @@ def test_convert(request, value, exp_value, exp_type):
      (1, True),
      (0, False),
 
-     ("TRUE", True),
-     ("FALSE", False),
      ]
 )
 def test_parse_boolean(request, value, exp_result):
