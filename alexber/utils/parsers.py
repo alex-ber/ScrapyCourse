@@ -96,7 +96,6 @@ def parse_boolean(value):
     if value in (True, False):
         return value
     try:
-        return {"true": True, "false": False}[value.casefold()]
+        return {"true": True, "false": False}[str(value).casefold()]
     except KeyError:
-        raise ValueError("unknown string for bool: %r" % value)
-
+        raise ValueError(f"unknown string for bool: {value!r}")

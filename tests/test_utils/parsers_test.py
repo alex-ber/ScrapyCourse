@@ -141,7 +141,10 @@ def test_parse_boolean(request, value, exp_result):
 
      ("1"),
      ("0"),
-     ]
+
+     (3.5),
+     ([]),
+    ]
 )
 
 
