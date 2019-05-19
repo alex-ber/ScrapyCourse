@@ -88,8 +88,40 @@ def safe_eval(value):
         ret = value
     return ret
 
+def is_empty(value):
+    '''
+    if value is None returns None.
+
+    if value is empty iterable (for example, empty str or emptry list),
+    returns true
+    otherwise false
+
+    Note: For not iterable values, behaivour is undefined.
+
+    :param value:
+    :return:
+    '''
+    if value is None:
+        return None
+    if value:
+        ret = False
+    else:
+        ret = True
+    return ret
 
 def parse_boolean(value):
+    '''
+    if value is None returns None.
+
+    if value is boolean, it ir returns as it is.
+    if value is str and value is equals ignoring case to "True", True is returned.
+    if value is str and value is equals ignoring case to "False", False is returned.
+
+    For every other value, the answer is undefined.
+
+    :param value:
+    :return:
+    '''
     if value is None:
         return None
 

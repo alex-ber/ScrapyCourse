@@ -1,7 +1,10 @@
 import logging
 import pytest
 
-from alexber.utils.parsers import ConfigParser, ArgumentParser, safe_eval, parse_boolean
+import enum
+from alexber.utils.enums import Enum
+
+from alexber.utils.parsers import ConfigParser, ArgumentParser, safe_eval, is_empty, parse_boolean
 
 logger = logging.getLogger(__name__)
 from pathlib import Path
@@ -100,6 +103,42 @@ def test_convert(request, value, exp_value, exp_type):
     pytest.assume(exp_type == type_result)
 
 
+@enum.unique
+class Color(Enum):
+    RED = 'r'
+    BLUE = 'b'
+    GREEN = 'g'
+
+
+@pytest.mark.parametrize(
+    'value, exp_result',
+    [
+     (True, False),
+     (False, True),
+     (None, None),
+
+     ("something", False),
+     #
+     (1, False),
+     (0, True),
+     (0.0, True),
+
+     ("1", False),
+     ("0", False),
+
+     (Color.RED, False),
+     ([], True),
+     ([None], False),
+     (['something'], False),
+     ]
+)
+def test_is_empty(request, value, exp_result):
+    logger.info(f'{request._pyfuncitem.name}()')
+
+    result = is_empty(value)
+    assert exp_result == result
+
+
 @pytest.mark.parametrize(
     'value, exp_result',
     [
@@ -121,7 +160,7 @@ def test_convert(request, value, exp_value, exp_type):
 
      (1, True),
      (0, False),
-
+     (0.0, False),
      ]
 )
 def test_parse_boolean(request, value, exp_result):
@@ -145,6 +184,9 @@ def test_parse_boolean(request, value, exp_result):
 
      (3.5),
      ([]),
+     (5),
+     (2.01),
+
     ]
 )
 
