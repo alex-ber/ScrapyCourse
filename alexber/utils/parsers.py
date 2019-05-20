@@ -90,7 +90,7 @@ def safe_eval(value):
 
 def is_empty(value):
     '''
-    if value is None returns None.
+    if value is None returns True.
 
     if value is empty iterable (for example, empty str or emptry list),
     returns true
@@ -102,7 +102,7 @@ def is_empty(value):
     :return:
     '''
     if value is None:
-        return None
+        return True
     if value:
         ret = False
     else:
