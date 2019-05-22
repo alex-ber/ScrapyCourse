@@ -1,9 +1,9 @@
 import logging
 logger = logging.getLogger(__name__)
-from pathlib import Path
 import pytest
 
 from alexber.utils.props import Properties
+from importlib.resources import open_text
 
 
 def test_parse_java_properties_alternative_delim(request, mocker):
@@ -14,10 +14,9 @@ def test_parse_java_properties_alternative_delim(request, mocker):
     expdd = {'playera.cls': 'alexber.rpsgame.players.ConstantPlayer',
              'playerb.cls': 'alexber.rpsgame.players.ConstantPlayer', }
 
-    dir = Path(__file__).parent
 
     p = Properties()
-    with open(dir / 'config2.properties') as f:
+    with open_text('tests_data.' + __package__, 'config2.properties') as f:
         p.load(f)
     dd = p.as_dict()
 
@@ -31,10 +30,8 @@ def test_parse_java_properties(request):
     expdd = {'playera.cls': 'alexber.rpsgame.players.ConstantPlayer',
              'playerb.cls': 'alexber.rpsgame.players.ConstantPlayer',}
 
-    dir = Path(__file__).parent
-
     p = Properties()
-    with open(dir / 'config.properties') as f:
+    with open_text('tests_data.' + __package__, 'config.properties') as f:
         p.load(f)
     dd = p.as_dict()
     #we want to ignore key inner.*

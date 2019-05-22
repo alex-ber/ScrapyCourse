@@ -10,15 +10,15 @@ logger = logging.getLogger(__name__)
 from pathlib import Path
 from decimal import Decimal
 from datetime import datetime
-
+from importlib.resources import open_text, path
 
 def test_parse_config(request):
     logger.info(f'{request._pyfuncitem.name}()')
 
     parser = ConfigParser()
-    dir = Path(__file__).parent
 
-    parser.read(dir / 'config.ini')
+    with path('tests_data.' + __package__, 'config.ini') as f:
+        parser.read(f)
 
     dd = parser.as_dict()
     da = dd['PLAYERA']
