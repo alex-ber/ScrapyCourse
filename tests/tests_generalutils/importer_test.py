@@ -1,6 +1,5 @@
 import pytest
 import logging
-import sys
 
 logger = logging.getLogger(__name__)
 from alexber.utils.importer import importer, new_instance
