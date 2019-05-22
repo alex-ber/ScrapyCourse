@@ -1,16 +1,15 @@
+import enum
 import logging
+
 import pytest
 
-import enum
 from alexber.utils.enums import Enum
-
 from alexber.utils.parsers import ConfigParser, ArgumentParser, safe_eval, is_empty, parse_boolean
 
 logger = logging.getLogger(__name__)
-from pathlib import Path
 from decimal import Decimal
 from datetime import datetime
-from importlib.resources import open_text, path
+from importlib.resources import path
 
 def test_parse_config(request):
     logger.info(f'{request._pyfuncitem.name}()')
