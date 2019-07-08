@@ -9,10 +9,10 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'quotes_spider'
+BOT_NAME = 'quotes'
 
-SPIDER_MODULES = ['alexber.quotes_spider.spiders']
-NEWSPIDER_MODULE = 'alexber.quotes_spider.spiders'
+SPIDER_MODULES = ['quotes_spider.spiders']
+NEWSPIDER_MODULE = 'quotes_spider.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
